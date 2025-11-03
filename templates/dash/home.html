@@ -1,0 +1,247 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+	
+    		<div class="row">
+                <div class="card-01">
+                	<a href="{% url 'order_list' %}"><div class="card-1-layout">
+                			<div class="info-1-left">
+                				<h3>Új Rendelések</h3>
+                				<h1>{{order_number}} DB</h1>
+                			</div>
+                			<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">list_alt</span></div>
+                	</div></a>
+                </div>
+                <div class="card-01 ds-n-2"><a href="{% url 'product_list' %}">
+                	<div class="card-1-layout">
+                			<div class="info-1-left">
+                				<h3>Termékek</h3>
+                				<h1>{{product_number}} DB</h1>
+                			</div>
+                			<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">
+                                inventory_2
+                                </span></div>
+                	</div>
+                </a></div>
+                <div class="card-01"><a href="{% url 'contacts' %}">
+                	<div class="card-1-layout">
+                			<div class="info-1-left">
+                				<h3>Új üzenetek:</h3>
+                				<h1> {{contact_number}} DB</h1>
+                			</div>
+                			<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">message</span></div>
+                	</div>
+                </a></div>
+				{% for shipping_cost in shipping_costs %}
+                <div class="card-01 ds-n-1"><a href="{% url 'edit_shipping' shipping_cost.id %}"></a>
+                	<div class="card-1-layout">
+                			<div class="info-1-left">
+                				<h3>Akutális szállítás</h3>
+                				<h1>{{shipping_cost.cost}}HUF</h1>
+                			</div>
+                			<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">delivery_truck_speed</span></div>
+                	</div>
+                </a></div>
+				{% endfor %}
+            </div>
+            <div class="row">
+                <div class="card-03">
+                	<h2>Rendelések (Új)</h2>
+					<table id="customers">
+						<thead>
+					  <tr class="pos-r">
+					    <th>Fizetés</th>
+						<th>Ár</th>
+					    <th>Megrendelő</th>
+						<th>Azonosító</th>
+						<th>Dátum</th>
+					  </tr>
+					  </thead>
+					  <!-- for orders in order-->{% for order in orders %}
+                       {% if order.status == 'Új' %}
+					  <tr>
+                        
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.payment_method}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.all_cost}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.name}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.order_id}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.created_at}}</a></td>
+					</tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td></td>
+					    <td></td>
+					    <td>Nincsen több csomagolandó termék...</td>
+					    <td></td>
+                        <td></td>
+					  </tr>
+					  <!--endfor-->{% endfor %}			  
+					 
+					</table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="card-03">
+                	<h2>Rendelések (Megtekintve)</h2>
+					<table id="customers">
+						<thead>
+					  <tr class="pos-r">
+					    <th>Fizetés</th>
+						<th>Ár</th>
+					    <th>Customer</th>
+						<th>Azonosító</th>
+						<th>Dátum</th>
+					  </tr>
+					  </thead>
+                      {% for order in orders %}
+					  {% if order.status == 'Megtekintve' %}
+					  <tr>
+                        
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.payment_method}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.all_cost}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.name}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.order_id}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.created_at}}</a></td>
+					</tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td></td>
+					    <td></td>
+					    <td>Nincsen több csomagolandó termék...</td>
+					    <td></td>
+                        <td></td>
+					  </tr>
+					  {% endfor %}	
+					    
+					  
+					 
+					</table>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="card-03">
+                	<h2>Rendelések (Összekészítve)</h2>
+					<table id="customers">
+						<thead>
+					  <tr class="pos-r">
+					    <th>Fizetés</th>
+						<th>Ár</th>
+					    <th>Customer</th>
+						<th>Azonosító</th>
+						<th>Dátum</th>
+					  </tr>
+					  </thead>
+                      {% for order in orders %}
+					  {% if order.status == 'Összekészítve' %}
+					  <tr>
+                        
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.payment_method}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.all_cost}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.name}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.order_id}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.created_at}}</a></td>
+					</tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td></td>
+					    <td></td>
+					    <td>Nincsen több csomagolandó termék...</td>
+					    <td></td>
+                        <td></td>
+					  </tr>
+					  {% endfor %}	
+					    
+					  
+					 
+					</table>
+                </div>
+                
+            </div>
+
+            <div class="row">
+                <div class="card-03">
+                	<h2>Rendelések (Becsomagolva)</h2>
+					<table id="customers">
+						<thead>
+					  <tr class="pos-r">
+					    <th>Fizetés</th>
+						<th>Ár</th>
+					    <th>Customer</th>
+						<th>Azonosító</th>
+						<th>Dátum</th>
+					  </tr>
+					  </thead>
+                      {% for order in orders %}
+					  {% if order.status == 'Becsomagolva' %}
+					  <tr>
+                        
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.payment_method}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.all_cost}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.name}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.order_id}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.created_at}}</a></td>
+					</tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td></td>
+					    <td></td>
+					    <td>Nincsen több csomagolandó termék...</td>
+					    <td></td>
+                        <td></td>
+					  </tr>
+					  {% endfor %}	
+					    
+					  
+					 
+					</table>
+                </div>
+                
+            </div>
+
+            <div class="row">
+                <div class="card-03">
+                	<h2>Rendelések (Feladva)</h2>
+					<table id="customers">
+						<thead>
+					  <tr class="pos-r">
+					    <th>Fizetés</th>
+						<th>Ár</th>
+					    <th>Customer</th>
+						<th>Azonosító</th>
+						<th>Dátum</th>
+					  </tr>
+					  </thead>
+                      {% for order in orders %}
+					  {% if order.status == 'Feladva' %}
+					  <tr>
+                        
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.payment_method}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.all_cost}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.name}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.order_id}}</a></td>
+						<td><a href="{% url 'order-page' order.order_id %}" style="color: black;">{{order.created_at}}</a></td>
+					</tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td></td>
+					    <td></td>
+					    <td>Nincsen több csomagolandó termék...</td>
+					    <td></td>
+                        <td></td>
+					  </tr>
+					  {% endfor %}	
+					    
+					  
+					 
+					</table>
+                </div>
+                
+            </div>
+{% endblock %}

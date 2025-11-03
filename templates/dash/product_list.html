@@ -1,0 +1,42 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Termékek</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Termék neve</th>
+                <th>Ár</th>
+                <th>ID</th>
+                <th>Létrehozva</th>
+                <th>Dátum</th>
+              </tr>
+              </thead>
+              {% for product in products %}
+              <tr>
+                  <td><a href="{% url 'product_edit' product.id %}" style="color: black;">{{product.name}}</a></td>
+                  <td><a href="{% url 'product_edit' product.id %}" style="color: black;">{{product.price}}</a></td>
+                  <td><a href="{% url 'product_edit' product.id %}" style="color: black;"></a>{{product.id}}</td>
+                  <td><a href="{% url 'product_edit' product.id %}" style="color: black;">{{product.created_at}}</a></td>
+                  <td><a href="{% url 'product_edit' product.id %}" style="color: black;">{{product.categories}}</a></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td></td>
+                <td></td>
+                <td>A végére értél...</td>
+                <td></td>
+                <td></td>
+              </tr>
+              {% endfor %}
+             
+            </table>
+        </div>
+    </div>
+
+
+    {% endblock %}

@@ -1,0 +1,153 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Rendelési adatok</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Fizetés</th>
+                <th>Nettó</th>
+                <th>Bruttó</th>
+                <th>Ár</th>
+                <th>Megrendelő neve:</th>
+                <th>Email:</th>
+                <th>Azonosító</th>
+                <th>Dátum</th>
+                <th>Áfa kulcs</th>
+              </tr>
+              </thead>
+              <tr>
+                <td>{{order.payment_method}}</td>
+                <td>{{order.net_price}}</td>
+                <td>{{order.brutto_price}}</td>
+                <td>{{order.all_cost}}</td>
+                <td>{{order.name}}</td>
+                <td>{{order.email}}</td>
+                <td>{{order.order_id}}</td>
+                <td>{{order.created_at}}</td>
+                <td>{{order.tax}}</td>
+              </tr>
+
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card-03">
+            <h2>Szállítási cím</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Irányítószám</th>
+                <th>cím</th>
+                <th>Egyéb</th>
+                <th>Telefonszám</th>
+                <th>Email</th>
+                <th>Szemályes Átvétel</th>
+              </tr>
+              </thead>
+              {% for ShippingAddress in shipping_address %}
+              <tr>
+                <td>{{ShippingAddress.state_num}}</td>
+                <td>{{ShippingAddress.address}}</td>
+                <td>{{ShippingAddress.door_num}}</td>
+                <td>{{ShippingAddress.phone}}</td>
+                <td>{{ShippingAddress.email}}</td>
+                <td>{{ShippingAddress.personal}}</td>
+              </tr>
+              {% endfor %}
+
+            </table>
+        </div>
+    </div>
+
+
+    <div class="row">
+      <div class="card-03">
+          <h2>Számlázási cím</h2>
+          <table id="customers">
+              <thead>
+            <tr class="pos-r">
+              <th>Cég/Név</th>
+              <th>Adószám</th>
+              <th>Cím</th>
+              <th>Létrehozva</th>
+              <th>Fizetés határidő</th>
+              <th>Fizetés teljesítve</th>
+            </tr>
+            </thead>
+            {% for BillingAddress in billing_address %}
+            <tr>
+              <td>{{BillingAddress.company}}</td>
+              <td>{{BillingAddress.tax}}</td>
+              <td>{{BillingAddress.address}}</td>
+              <td>{{BillingAddress.created_at}}</td>
+              <td>{{BillingAddress.payment_deadline}}</td>
+              <td>{{BillingAddress.completed}}</td>
+            </tr>
+            {% endfor %}
+
+          </table>
+      </div>
+  </div>
+
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Termékek</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Kép</th>
+                <th>Név</th>
+                <th>Termék száma</th>
+                <th>Ár</th>
+                <th>Elérhetőség</th>
+                <th>Termék azonosító</th>
+              </tr>
+              </thead>
+              {% for orderItem in order_items %}
+              <tr>
+                <td><img src="{{orderItem.product.image.url}}" alt="" class="cart-img" style="max-width: 100px"></td>
+                <td>{{orderItem.product.name}}</td>
+                <td>{{orderItem.quantity}}</td>
+                <td>{{orderItem.price}}</td>
+                <td>{{orderItem.product.available}}</td>
+                <td>{{orderItem.product.id}}</td>
+              </tr>
+              {% endfor %}
+            </table>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="card-04">
+            <h2>A rendelés kezelése</h2>
+            <form method="POST" style="padding: 30px">
+                {% csrf_token %}
+                {{form}}<br><br>
+                <button type="submit">Mentés!</button>
+            </form>
+        </div>
+    </div>
+
+    <style>select, button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    </style>
+
+
+
+
+    {% endblock %}

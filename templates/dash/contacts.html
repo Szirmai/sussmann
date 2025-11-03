@@ -1,0 +1,116 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Megkeresések (Új)</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Név</th>
+                <th>Email</th>
+                <th>Tárgy</th>
+                <th>Dátum</th>
+              </tr>
+              </thead>
+              {% for contact in contacts %}
+              {% if contact.status == 'Új' %}
+              <tr>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.name}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.email}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.subject}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.created_at}}</a></td>
+              </tr>{% endif %}
+              {% empty %}
+              
+              <tr>
+                <td></td>
+                <td></td>
+                <td>A végére értél...</td>
+                <td></td>
+                <td></td>
+              </tr>
+              
+              {% endfor %}
+             
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Megkeresések (Megtekintve)</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Név</th>
+                <th>Email</th>
+                <th>Tárgy</th>
+                <th>Dátum</th>
+              </tr>
+              </thead>
+              {% for contact in contacts %}
+              {% if contact.status == 'Megtekintve' %}
+              <tr>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.name}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.email}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.subject}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.created_at}}</a></td>
+              </tr>
+              {% endif %}
+              {% empty %}
+              
+              <tr>
+                <td></td>
+                <td></td>
+                <td>A végére értél...</td>
+                <td></td>
+                <td></td>
+              </tr>
+              
+              {% endfor %}
+             
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Megkeresések (Válaszolva)</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Név</th>
+                <th>Email</th>
+                <th>Tárgy</th>
+                <th>Dátum</th>
+              </tr>
+              </thead>
+              {% for contact in contacts %}
+              {% if contact.status == 'Válaszolva' %}
+              <tr>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.name}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.email}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.subject}}</a></td>
+                  <td><a href="{% url 'contact_dash' contact.id %}" style="color: black;">{{contact.created_at}}</a></td>
+              </tr> {% endif %}
+              {% empty %}
+              
+              <tr>
+                <td></td>
+                <td></td>
+                <td>A végére értél...</td>
+                <td></td>
+                <td></td>
+              </tr>
+             
+              {% endfor %}
+             
+            </table>
+        </div>
+    </div>
+
+
+    {% endblock %}

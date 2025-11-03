@@ -1,0 +1,55 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+
+    
+    <div class="row">
+        <div class="card-04">
+            <h2>A rendelés kezelése</h2>
+            <form method="POST" enctype="multipart/form-data" style="padding: 30px; display: flex; flex-direction: column">
+                {% csrf_token %} 
+                {{form}}
+                <button type="submit">Mentés!</button>
+            </form>
+        </div>
+    </div>
+
+    <style>select,
+        button,
+        input,
+        textarea {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    form {
+        gap: 15px;
+        align-items: center
+    }
+    textarea {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        min-height: 200px;
+        max-height: 200px;
+    }
+    </style>
+
+
+
+
+    {% endblock %}

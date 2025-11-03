@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+	{% block content %}
+
+	<!-- search area -->
+	<div class="search-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="close-btn"><i class="fas fa-window-close"></i></span>
+					<div class="search-bar">
+						<div class="search-bar-tablecell">
+							<h3>Search For:</h3>
+							<input type="text" placeholder="Keywords">
+							<button type="submit">Search <i class="fas fa-search"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end search arewa -->
+	
+	<!-- breadcrumb-section -->
+	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/hatter.webp');">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="breadcrumb-text">
+						<p>...</p>
+						<h1>Megrendelés</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end breadcrumb section -->
+
+	<!-- check out section -->
+	<div class="checkout-section mt-150 mb-150">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8">
+					<div class="checkout-accordion-wrap">
+						<div class="accordion" id="accordionExample">
+						  <div class="card single-accordion">
+						    <div class="card-header" id="headingOne">
+						      <h5 class="mb-0">
+						        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+						          Számlázás
+						        </button>
+						      </h5>
+						    </div>
+
+						    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+						      <div class="card-body">
+						        <div class="billing-address-form">
+						        	<form action="" id="billing-form">
+										{% csrf_token %}
+						        		<p><input type="text" name="name" placeholder="* Név" required></p>
+    									<p><input type="email" name="email" placeholder="* Email" required></p>
+    									<p><input type="text" name="company" placeholder="Cégnév (Cég esetén)"></p>
+										<p><input type="text" name="tax" placeholder="Adószám (*Cég esetén)"></p>
+    									<p><input type="text" name="billing_address" placeholder="Billing Address" required></p>
+						        	</form>
+						        </div>
+						      </div>
+						    </div>
+						  </div>
+						  <div class="card single-accordion">
+						    <div class="card-header" id="headingTwo">
+						      <h5 class="mb-0">
+						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						          Szállítás
+						        </button>
+						      </h5>
+						    </div>
+						    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+						      <div class="card-body">
+						        <div class="billing-address-form">
+						        	<form action="" id="shipping-form">
+										{% csrf_token %}
+						        		<p><input type="text" name="shipping_address" placeholder="Cím" required></p>
+    									<p><input type="text" name="phone" placeholder="* Telefonszám (+36 70 ... ....)" required></p>
+										<p><input type="text" name="email_trans" placeholder="* Email..." required></p>
+    									<p><input type="text" name="state_num" placeholder="Irányítószám"></p>
+    									<p><input type="text" name="door_num" placeholder="Ajtó / Emelet / Megjegyzés"></p>
+										<p><input type="checkbox" name="checkbox">Személyes átvétel: Budapest beváros vagy Verőce (További egyeztetés a rendelés leadása után emailben.)<br>Ha messzebb laksz de nem akarsz otthon várni a csomagra, akkor kattintsd be ezt a gombot és megbeszéljük...(foxpost, GLS Box, stb...)</p>
+										<p style="color: red;"></p>
+						        	</form>
+						        </div>
+						      </div>
+						    </div>
+						  </div>
+						  <div class="card single-accordion">
+						    <div class="card-header" id="headingThree">
+						      <h5 class="mb-0">
+						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+						          Fizetési Mód
+						        </button>
+						      </h5>
+						    </div>
+						    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+						      <div class="card-body">
+						        <div class="billing-address-form">
+						        	<form action="" id="payment-form">
+										{% csrf_token %}
+						        		<select name="payment_method" required>
+											<p><option value="utalas">Előre Utalás </option></p>
+											<p><option value="utanvet">Utánvét</option></p>
+											
+										</select>		
+										<p style="color: red;">A megrendelés fizetési kötelezettséggel jár, az utánvétet személyes átvétellel preferálom.</p>							
+						        	</form>
+						        </div>
+						      </div>
+						    </div>
+						  </div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-lg-4">
+					<div class="order-details-wrap">
+						<table class="order-details">
+							<thead>
+								<tr>
+									<th>Termék:</th>
+									<th>Ár:</th>
+								</tr>
+							</thead>
+							<tbody class="order-details-body">
+								
+								{% for item in cart_items %}<tr>
+									<td>{{item.name}}</td>
+									<td>{{item.total_price}} Ft</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+							<tbody class="checkout-details">
+								<thead>
+								<tr>
+									<th>Részletek:</th>
+									<th>Ár:</th>
+								</tr>
+							</thead>
+								<tr>
+									<td>Termékek ára</td>
+									<td>{{bruttó_price}} Ft</td>
+								</tr>
+								<tr>
+									<td>Szállítás</td>
+									<td>{{shipping_cost}} Ft</td>
+								</tr>
+								<tr>
+									<td>Összesen</td>
+									<td>{{összesen_price}} Ft</td>
+								</tr>
+							</tbody>
+						</table>
+						<a class="boxed-btn" type="button" id="submit-all">Megrendelés</a>
+						<a><p style="color: red;">Ha nem működik ez a gomb, győződj meg arról, hogy a *-gal jelölt mezők ki vannak töltve.</p>	</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end check out section -->
+	 <script>
+	document.getElementById("submit-all").addEventListener("click", function () {
+		console.log("Submit button clicked!");  // Debugging log
+	
+		let formData = new FormData();
+	
+		let billingForm = new FormData(document.getElementById("billing-form"));
+		let shippingForm = new FormData(document.getElementById("shipping-form"));
+		let paymentForm = new FormData(document.getElementById("payment-form"));
+	
+		for (let pair of billingForm.entries()) {
+			formData.append(pair[0], pair[1]);
+		}
+		for (let pair of shippingForm.entries()) {
+			formData.append(pair[0], pair[1]);
+		}
+		for (let pair of paymentForm.entries()) {
+			formData.append(pair[0], pair[1]);
+		}
+	
+		console.log("Form Data:", [...formData.entries()]);  // Check if data is collected correctly
+	
+		fetch("{% url 'create_order' %}", {
+			method: "POST",
+			body: formData,
+			headers: {
+				"X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+			}
+		})
+		.then(response => {
+			console.log("Response received:", response);
+			return response.json();
+		})
+		.then(data => {
+			console.log("Response Data:", data);  // Log response for debugging
+			if (data.success) {
+				window.location.href = "{% url 'success' %}";
+			} else {
+				alert("Error placing order. Please try again.");
+			}
+		})
+		.catch(error => console.error("Error:", error));
+	});
+</script>
+	<!-- logo carousel
+	<div class="logo-carousel-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="logo-carousel-inner">
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/1.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/2.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/3.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/4.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/5.png" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	end logo carousel -->
+
+	{% endblock %}

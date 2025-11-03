@@ -1,0 +1,58 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-03">
+            <h2>{{title}}</h2>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Név</th>
+                <th>Email</th>
+                <th>Tárgy</th>
+                <th>Dátum</th>
+              </tr>
+              </thead>
+              <tr>
+                  <td><a href="" style="color: black;">{{contact.name}}</a></td>
+                  <td><a href="" style="color: black;">{{contact.email}}</a></td>
+                  <td><a href="" style="color: black;">{{contact.subject}}</a></td>
+                  <td><a href="" style="color: black;">{{contact.created_at}}</a></td>
+              </tr>
+             
+            </table>
+            <div class="row">
+                <div class="card-03">
+                <p style="padding: 40px">{{contact.message}}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="card-04">
+            <h2>A levél kezelése</h2>
+            <form method="POST" style="padding: 30px" action="{% url 'contact_dash' contact.id %}">
+                {% csrf_token %}
+                {{form}}<br><br>
+                <button type="submit">Mentés!</button>
+            </form>
+        </div>
+    </div>
+
+    <style>select, button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    </style>
+
+
+    {% endblock %}

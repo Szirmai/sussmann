@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+	{% block content %}
+	<!-- search area -->
+	<div class="search-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="close-btn"><i class="fas fa-window-close"></i></span>
+					<div class="search-bar">
+						<div class="search-bar-tablecell">
+							<h3>Search For:</h3>
+							<input type="text" placeholder="Keywords">
+							<button type="submit">Search <i class="fas fa-search"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end search arewa -->
+	
+	<!-- breadcrumb-section -->
+	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/unnamed.jpg');">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="breadcrumb-text">
+						<p>...</p>
+						<h1>Kosár</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end breadcrumb section -->
+
+	<!-- testing the gpt's version-->
+
+
+
+	<!-- testing end -->
+
+	<!-- cart -->
+	<div class="cart-section mt-150 mb-150">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-md-12">
+					<div class="cart-table-wrap">
+						<table class="cart-table">
+							<thead class="cart-table-head">
+								<tr class="table-head-row">
+									<th class="product-remove"></th>
+									<th class="product-image">Kép</th>
+									<th class="product-name">Név</th>
+									<th class="product-price">Egys.Ár</th>
+									<th class="product-quantity">Mennyiség</th>
+									<th class="product-total">Összesen</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in cart_items %}
+								<tr class="table-body-row">
+									<td class="product-remove">
+										<a href="{% url 'cart_remove' item.id %}">
+											<i class="far fa-window-close"></i>
+										</a>
+									</td>
+									<td class="product-image"><img src="assets/img/products/product-img-1.jpg" alt=""></td>
+									<td class="product-name">{{ item.name }}</td>
+									<td class="product-price">{{ item.price}} Ft</td>
+									<td class="product-quantity">{{ item.quantity }}</td>
+									<td class="product-total">{{ item.total_price}} Ft</td>
+								</tr>
+							{% empty %}
+								<p  style="color: red">A kosár üres!</p>
+							{% endfor %}
+							
+
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="col-lg-4">
+					<div class="total-section">
+						<table class="total-table">
+							<thead class="total-table-head">
+								<tr class="table-total-row">
+									<th>Összesen</th>
+									<th>Végösszeg</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="total-data">
+									<td><strong>Nettó: </strong></td>
+									<td>{{ nettó_price }} Ft</td>
+								</tr>
+								<tr class="total-data">
+									<td><strong>Bruttó: </strong></td>
+									<td>{{ bruttó_price }} Ft</td>
+								</tr>
+								<tr class="total-data">
+									<td><strong>Szállítás/Átvételi díj: </strong></td>
+									<td>{{ shipping_cost }} Ft</td>
+								</tr>
+								<tr class="total-data">
+									<td><strong>Összesen: </strong></td>
+									<td>{{ összesen_price }} Ft</td>
+								</tr>
+							</tbody>
+							
+						</table>
+						<div class="cart-buttons">
+							<a href="{% url 'cart_view' %}" class="boxed-btn">Kosár Frissítése</a>
+{% if cart_items %}
+<a href="{% url 'checkout' %}" class="boxed-btn black">Megrendelés</a>
+{%endif%}
+						</div>
+					</div>
+
+					<!--<div class="coupon-section">
+						<h3>Apply Coupon</h3>
+						<div class="coupon-form-wrap">
+							<form action="index.html">
+								<p><input type="text" placeholder="Coupon"></p>
+								<p><input type="submit" value="Apply"></p>
+							</form>
+						</div>
+					</div>-->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end cart -->
+
+	<!-- logo carousel 
+	<div class="logo-carousel-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="logo-carousel-inner">
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/1.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/2.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/3.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/4.png" alt="">
+						</div>
+						<div class="single-logo-item">
+							<img src="assets/img/company-logos/5.png" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	end logo carousel -->
+
+	{% endblock %}

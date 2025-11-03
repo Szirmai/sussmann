@@ -1,0 +1,40 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+
+    
+    <div class="row">
+        <div class="card-04">
+            <h2>{{title}}</h2>
+            <a href="{% url 'add_cost_cat' %}" style="padding: 20px">+ Kategória hozzáadása</a>
+            <form method="POST" style="padding: 30px">
+                {% csrf_token %}
+              <p>  {{form.title}} </p>
+               <p> {{form.cost}} </p>
+               <p> {{form.cause}} </p>
+               <p> {{form.type}}<br><br></p>
+                <button type="submit">Mentés!</button>
+            </form>
+            <p>{{note}}</p>
+        </div>
+    </div>
+
+    <style>select, button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    p {
+        padding: 20px;
+        color: darkred;
+    }
+    </style>
+
+{% endblock %}

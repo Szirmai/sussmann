@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{title}}</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/dash/style-dash.css' %}">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+	<nav>
+		<div class="top-nav">
+			<div class="float-left">
+				<div class="right"><a href="{% url 'dash-home' %}">
+					<span class="material-symbols-outlined logo">travel_explore</span></a><a href="{% url 'dash-home' %}">
+					<h2>WEB'<i> Dash</i></h2></a>
+				</div>
+			</div>
+			<div class="input">
+			</div>
+		</div>
+	</nav>
+
+
+		<div class="responsive-nav">
+			<div>
+				<ul class="flex-row-ect">
+					<li class="tiny-text-flex"><a href="{% url 'dash-home' %}"><span class="material-symbols-outlined">grid_view</span></a>
+						<small>Irányítópult</small>
+					</li>
+					<li class="tiny-text-flex"><a href="{% url 'product_create' %}"><span class="material-symbols-outlined">upload</span></a>
+						<small>Termék...</small>
+					</li>
+                    <li class="tiny-text-flex"><a href="{% url 'product_list' %}"><span class="material-symbols-outlined">inventory_2</span></a>
+						<small>Termékek</small>
+					</li>
+					<li class="tiny-text-flex"><a href="{% url 'contacts' %}"><span class="material-symbols-outlined">mail</span></a>
+						<small>kontakt</small>
+					</li>
+
+
+                    <li class="tiny-text-flex"><a href="{% url 'order_list' %}"><span class="material-symbols-outlined">list_alt</span></a>
+						<small>Rendelések</small>
+					</li>
+                    <li class="tiny-text-flex"><a href="{% url 'bussiness_home' %}"><span class="material-symbols-outlined">finance_chip</span></a>
+						<small>Pénzügyek</small>
+					</li>
+                    
+				</ul>
+			</div>
+		</div>
+
+
+<div class="grid">
+	<section>
+		<div class="sidebar-side">
+			<ul class="sidebar-nav">
+
+				<li class="nav-item">
+					<a href="{% url 'dash-home' %}" class="nav-link">
+						<span class="material-symbols-outlined">grid_view</span>
+						<h2 class="link-text">Irányítópult</h2>
+					</a>
+				</li>
+
+
+
+                <li class="nav-item">
+					<a href="{% url 'product_create' %}" class="nav-link">
+						<span class="material-symbols-outlined">upload</span>
+						<h2 class="link-text">Termék feltöltése</h2>
+					</a>
+				</li>
+
+                <li class="nav-item">
+					<a href="{% url 'product_list' %}" class="nav-link">
+						<span class="material-symbols-outlined">inventory_2</span>
+						<h2 class="link-text">Termékek</h2>
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a href="{% url 'contacts' %}" class="nav-link">
+						<span class="material-symbols-outlined">mail</span>
+						<h2 class="link-text">Kontakt</h2>
+					</a>
+				</li>
+
+                <li class="nav-item">
+					<a href="{% url 'order_list' %}" class="nav-link">
+						<span class="material-symbols-outlined">list_alt</span>
+						<h2 class="link-text">Rendelések</h2>
+					</a>
+				</li>
+
+                <li class="nav-item">
+					<a href="{% url 'bussiness_home' %}" class="nav-link">
+						<span class="material-symbols-outlined">finance_chip</span>
+						<h2 class="link-text">Pénzügyek</h2>
+					</a>
+				</li>
+
+
+                <li class="nav-item">
+					<a href="{% url 'logout' %}" class="nav-link">
+						<span class="material-symbols-outlined">logout</span>
+						<h2 class="link-text">Kijelentkezés</h2>
+					</a>
+				</li>
+
+			</ul>
+		</div>
+	</section>
+
+    	<main class="main">
+        {% block content %}
+
+        {% endblock %}
+            <div class="row">
+                <div class="card-05">
+                	<div class="foot-lay-f">
+                	<h6>&copy;</h6> <a href="#">Lengemagyar</a> <h6> All Right Reserved.</h6>
+                	</div>
+                	<div class="foot-lay-f abs-r">
+                	<h6>Designed by: </h6><a href="#">Lengemagyar</a> <h6></h6>
+                	</div>
+                </div>
+            </div>
+		</main>
+
+</div>
+{% for message in messages %}
+	{% if message.tags == 'success' %}
+	<div id="success-message" class="center-message">{{message}}</div>
+	{% elif message.tags == 'error' %}
+	<div id="success-message" class="center-message-red">{{message}}</div>
+	{% else %}
+	<div id="success-message" class="center-message-info">{{message}}</div>
+	{% endif %}
+	{% endfor %}
+
+<style>
+    .center-message {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: green; /* Zöld szín példaként */
+        color: white;
+        padding: 10px;
+        display: none; /* Kezdetben elrejtve */
+        text-align: center;
+        transition: 0.3s;
+        z-index: 100000000;
+    }
+    
+    .center-message-red {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: darkred; /* Zöld szín példaként */
+        color: white;
+        padding: 10px;
+        display: none; /* Kezdetben elrejtve */
+        text-align: center;
+        transition: 0.3s;
+        z-index: 100000000;
+    }
+    
+    .center-message-info {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: black; /* Zöld szín példaként */
+        color: white;
+        padding: 10px;
+        display: none; /* Kezdetben elrejtve */
+        text-align: center;
+        transition: 0.3s;
+        z-index: 100000000;
+    }
+    
+    .center-message-info-email {
+    
+        background-color: lightgoldenrodyellow; /* Zöld szín példaként */
+        color: black;
+        padding: 10px;
+        text-align: center;
+        transition: 0.3s;
+        position: relative;
+        z-index: 1000000000000;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-bottom: -2px;
+        flex-wrap: wrap;
+    }
+    
+    .center-message-info-email form {
+        padding: 0 10px;
+        margin: 0;
+    }
+    
+    .center-message-info-customer {
+    
+        background-color: darkred; /* Zöld szín példaként */
+        color: white;
+        padding: 10px;
+        text-align: center;
+        transition: 0.3s;
+        position: relative;
+        z-index: 100000000000000;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-bottom: -2px;
+    }
+    
+    .center-message-info-customer button {
+        margin: 0 10px;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var messageDiv = document.getElementById('success-message');
+
+        // Ellenőrizzük, hogy az üzenet div tartalmaz-e valamilyen szöveget
+        if (messageDiv.innerText.trim() !== '') {
+            // Megjelenítjük az üzenetet
+            messageDiv.style.display = 'block';
+
+            // Automatikus eltűntetés 5 másodperc után
+            setTimeout(function () {
+                messageDiv.style.display = 'none';
+            }, 5000); // 5000 milli másodperc = 5 másodperc
+        }
+    });
+</script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+	</body>
+</html>

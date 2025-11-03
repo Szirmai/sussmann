@@ -1,0 +1,48 @@
+	<!-- footer -->{% load static %}
+	<div class="footer-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box about-widget">
+						<h2 class="widget-title">Rólam</h2>
+						<p>Számomra a kézművesség lényege nem a hibátlan precizitás, hanem az egyediség és a tárgy lelke.</p>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box get-in-touch">
+						<h2 class="widget-title">Lépj Kapcsolatba</h2>
+						<ul>
+							<li></li>
+							<li>szirmai.qnl@gmail.com</li>
+							<li>+36 70 941 4321</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box pages">
+						<h2 class="widget-title">Oldalak</h2>
+						<ul>
+							<li><a href="{% url 'home' %}">Otthon</a></li>
+							<li><a href="{% url 'about' %}">Rólam</a></li>
+							<li><a href="{% url 'shop' %}">Bolt</a></li>
+							<li><a href="{% url 'contact' %}">Kapcsolat</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box subscribe">
+						<h2 class="widget-title">Feliratkozás</h2>
+						<p>Néha kaphatsz emailt különleges termékeimről...</p>
+						<form action="{% url 'subsc' %}" method="POST">
+							{% csrf_token %}
+							<input type="email" name="email" placeholder="* Email..." required>
+							<button type="submit"><i class="fas fa-paper-plane"></i></button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end footer -->
+	
+	

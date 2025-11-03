@@ -1,0 +1,344 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+	
+	<div class="row">
+		<div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Összes költség</h3>
+						<h1>{{cost_value}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">list_alt</span></div>
+			</div></a>
+		</div>
+		<div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Összes bevétel</h3>
+						<h1>{{total_cost}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">shopping_cart_checkout</span></div>
+			</div></a>
+		</div>
+		<div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>~Profit (Költség-Bevétel)</h3>
+						<h1>{{total_profit}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
+			</div></a>
+		</div>
+		
+	</div>
+	
+	<div class="row">
+		<div class="card-02">
+			<h2>Költségek (Típusokra lebontva)</h2>
+			<canvas id="costChart"></canvas>        
+			<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+				<script>
+  // Django template-ből érkező adatok
+  const labels = {{ labels|safe }};  // CostType nevek
+  const values = {{ values|safe }};  // CostType-hoz tartozó összegek
+
+  const ctx = document.getElementById('costChart');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Költségek típusonként',
+        data: values,
+        backgroundColor: 'rgba(38,84,124, 0.7)',
+        borderColor: 'rgba(38,84,124, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+		</div>
+		<div class="card-02">
+			<h2>Költségek (Hónapokra és típúsokra bontva)</h2>
+			<canvas id="monthlyCostByTypeChart"></canvas>
+			<script>
+  const monthlyCostCtx = document.getElementById('monthlyCostByTypeChart');
+  new Chart(monthlyCostCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ monthly_labels|safe }},
+      datasets: {{ monthly_datasets|safe }}
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="card-02">
+			<h2>Bevételek (Hónapokra lebontva)</h2>
+			<canvas id="monthlyRevenueChart"></canvas>
+			<script>
+    // Django template-ből érkező adatok
+    const labels_chart = {{ chart_labels|safe }};  // Hónapok
+    const data_chart = {{ chart_data|safe }};      // Havi bevételek
+
+    console.log("Chart labels:", labels_chart);
+    console.log("Chart data:", data_chart);
+
+    const ctx_chart = document.getElementById('monthlyRevenueChart').getContext('2d');
+    new Chart(ctx_chart, {
+        type: 'line',
+        data: {
+            labels: labels_chart,
+            datasets: [{
+                label: 'Bevétel (Ft)',
+                data: data_chart,
+                backgroundColor: 'rgba(38, 84, 124, 0.7)',
+                borderColor: 'rgba(38, 84, 124, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();  // Formázott számok
+                        }
+                    }
+                }
+            }
+        }
+    });
+			</script>
+		</div>
+
+		<div class="card-02">
+			<h2>Rendelések száma (Hónapokra lebontva)</h2>
+			<canvas id="monthlyOrdersChart"></canvas>
+			<script>
+               const orders_labels_chart = {{ orders_labels|safe }};  // Hónapok
+            const orders_values_chart = {{ orders_values|safe }};  // Megrendelések száma
+
+            console.log("Orders labels:", orders_labels_chart);
+            console.log("Orders data:", orders_values_chart);
+
+            const ordersCtx = document.getElementById('monthlyOrdersChart').getContext('2d');
+            new Chart(ordersCtx, {
+                type: 'line',
+                data: {
+                    labels: orders_labels_chart,
+                    datasets: [{
+                        label: 'Megrendelések száma',
+                        data: orders_values_chart,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0 // Ne legyen tizedesjegy
+                            }
+                        }
+                    }
+                }
+            });
+			</script>
+		</div>
+
+
+
+	</div>
+
+  <div class="row">
+    <div class="card-02">
+        <h2>Bevételek (Az utolsó 7 nap)</h2>
+        <canvas id="revenueChart_daily"></canvas>
+        <script type="application/json" id="chartLabelsDaily">
+          {{ chart_labels_daily|safe|json_script:"chartLabelsDaily" }}
+      </script>
+      <script type="application/json" id="chartDataDaily">
+          {{ chart_data_daily|safe|json_script:"chartDataDaily" }}
+      </script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const datetime = "{{ today|date:'Y-m-d' }}";  
+            console.log("Django date string:", datetime);
+    
+            const dateObj = new Date(datetime + "T00:00:00");
+            console.log("Date object:", dateObj);
+    
+            const element = document.getElementById('revenueChart_daily');
+            if (element) {
+                console.log("Canvas element found:", element);
+            } else {
+                console.log("Az elem nem található!");
+                return;
+            }
+    
+            try {
+                const labels_daily = JSON.parse('{{ chart_labels_daily|safe }}');
+                const data_daily = JSON.parse('{{ chart_data_daily|safe }}');
+    
+                console.log("Chart labels:", labels_daily);
+                console.log("Chart data:", data_daily);
+    
+                const ctx_daily = element.getContext('2d');
+                new Chart(ctx_daily, {
+                    type: 'line',
+                    data: {
+                        labels: labels_daily,
+                        datasets: [{
+                            label: 'Bevétel (Ft)',
+                            data: data_daily,
+                            backgroundColor: 'rgba(38, 84, 124, 0.7)',
+                            borderColor: 'rgba(38, 84, 124, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+    
+            } catch (error) {
+                console.error("JSON parsing error:", error);
+            }
+        });
+    </script>
+    
+          
+    </div>
+
+    <div class="card-02">
+      <h2>Rendelések száma (Az utolsó 7 nap)</h2>
+      <canvas id="orderChart_daily"></canvas>
+      <script>
+          document.addEventListener("DOMContentLoaded", function () {
+              // Django-ból érkező adatok
+              const labels_daily = {{ chart_labels_daily|safe }};
+              const orders_daily_count = {{ chart_orders_daily_count|safe }};
+              
+              // Új diagram a rendelési számoknak
+              const ctx_orders = document.getElementById('orderChart_daily').getContext('2d');
+              new Chart(ctx_orders, {
+                  type: 'line',
+                  data: {
+                      labels: labels_daily,
+                      datasets: [{
+                          label: 'Rendelések száma',
+                          data: orders_daily_count,
+                          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                          borderColor: 'rgba(255, 99, 132, 1)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              ticks: {
+                                  stepSize: 1, // Csak egész számokat mutasson
+                                  callback: function(value) {
+                                      return value.toLocaleString();  
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+          });
+      </script>
+  </div>
+
+</div>
+
+	
+	
+	<div class="row">
+		<div class="card-03">
+			<h2>Kiadások </h2>
+			<a style="padding: 20px" href="{% url 'add_cost' %}">Költség hozzáadása +</a>
+			<table id="customers">
+				<thead>
+			  <tr class="pos-r">
+				<th>Cím</th>
+				<th>Költség</th>
+				<th>Dátum</th>
+				<th>Miért?</th>
+				<th>Típus</th>
+        <th></th>
+        <th></th>
+			  </tr>
+			  </thead>
+			  {% for cost in costs %}
+			  <a href="{% url 'edit_cost' cost.id %}"><tr>				
+				<td>{{cost.title}}</td>
+				<td>{{cost.cost}}</td>
+				<td>{{cost.created_at}}</td>
+				<td>{{cost.cause}}</td>
+				<td>{{cost.type.name}}</td>
+        <td><a href="{% url 'edit_cost' cost.id %}">Szerkesztés </a></td>
+        <td>
+          <form method="POST" action="{% url 'delete_cost' cost.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" style="color: darkred; background: none; border: none; cursor: pointer;">X</button>
+          </form>
+      </td>
+			</tr></a>
+			{% empty %}
+			<tr>
+				<td></td>
+
+				<td>Nincsenek kiadások...</td>
+
+			  </tr>
+			{% endfor %}
+
+			
+  
+			 
+			</table>
+		</div>
+	</div>
+
+	
+
+
+{% endblock %}

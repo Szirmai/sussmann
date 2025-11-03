@@ -1,0 +1,150 @@
+
+
+
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
+
+	<!-- title -->
+	<title>{{title}}</title>
+
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/png" href="{% static 'assets/img/favi.png' %}">
+	<!-- google font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="{% static 'assets/css/all.min.css' %}">
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
+	<!-- owl carousel -->
+	<link rel="stylesheet" href="{% static 'assets/css/owl.carousel.css' %}">
+	<!-- magnific popup -->
+	<link rel="stylesheet" href="{% static 'assets/css/magnific-popup.css' %}">
+	<!-- animate css -->
+	<link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+	<!-- mean menu css -->
+	<link rel="stylesheet" href="{% static 'assets/css/meanmenu.min.css' %}">
+	<!-- main style -->
+	<link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+	<!-- responsive -->
+	<link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+
+</head>
+<body>
+	
+	<!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
+    {% include 'header.html' %}
+	{% block content %}
+
+
+    {% endblock %}
+	{% if messages %}
+    <div id="cart-message" class="fixed-alert">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+    {% include 'footer.html' %}
+<!-- copyright -->
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.</p>
+            </div>
+            <div class="col-lg-6 text-right col-md-12">
+                <div class="social-icons">
+                    <ul>
+                        <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        <li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end copyright -->
+
+
+<style>
+
+.fixed-alert {
+    position: fixed;
+    top: 20px;  /* Distance from the top of the page */
+    right: 20px;  /* Distance from the right side */
+    z-index: 1000;  /* Ensures it stays on top of everything */
+    width: 300px;  /* Adjust width as needed */
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+</style>
+
+<script>
+    setTimeout(function() {
+        let messageBox = document.getElementById("cart-message");
+        if (messageBox) {
+            messageBox.style.display = "none";
+        }
+    }, 3000); // Hide after 3 seconds
+</script>
+<!-- jquery -->
+<script src="{% static 'assets/js/jquery-1.11.3.min.js' %}"></script>
+<!-- bootstrap -->
+<script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+<!-- count down -->
+<script src="{% static 'assets/js/jquery.countdown.js' %}"></script>
+<!-- isotope -->
+<script src="{% static 'assets/js/jquery.isotope-3.0.6.min.js' %}"></script>
+<!-- waypoints -->
+<script src="{% static 'assets/js/waypoints.js' %}"></script>
+<!-- owl carousel -->
+<script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+<!-- magnific popup -->
+<script src="{% static 'assets/js/jquery.magnific-popup.min.js' %}"></script>
+<!-- mean menu -->
+<script src="{% static 'assets/js/jquery.meanmenu.min.js' %}"></script>
+<!-- sticker js -->
+<script src="{% static 'assets/js/sticker.js' %}"></script>
+<!-- main js -->
+<script src="{% static 'assets/js/main.js' %}"></script>
+
+</body>
+</html>

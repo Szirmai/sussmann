@@ -1,0 +1,76 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+
+    
+    <div class="row">
+        <div class="card-04">
+            <h2>{{title}}</h2>
+            <a href=""></a>
+            <form method="POST" style="padding: 30px">
+                {% csrf_token %}
+              <p>  {{form.name}} </p>
+<br><br>
+                <button type="submit">Mentés!</button>
+            </form>
+            
+        </div>
+    </div>
+	<div class="row">
+		<div class="card-03">
+            <p>{{note}}</p>
+			<h2>Költség kategória</h2>
+			<a style="padding: 20px" href="{% url 'add_cost' %}">Költség hozzáadása +</a>
+			<table id="customers">
+				<thead>
+			  <tr class="pos-r">
+				<th>Név</th>
+
+        <th>Törlés</th>
+			  </tr>
+			  </thead>
+			  {% for costType in costtypes %}
+			  <tr>				
+				<td>{{costType.name}}</td>
+        <td>
+          <form method="POST" action="{% url 'delete_cost_cat' costType.id %}"  style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" style="color: darkred; background: none; border: none; cursor: pointer;">X</button>
+          </form>
+      </td>
+
+			</tr></a>
+			{% empty %}
+			<tr>
+				<td></td>
+
+				<td>Nincsenek kiadások...</td>
+
+			  </tr>
+			{% endfor %}
+
+			
+  
+			 
+			</table>
+		</div>
+	</div>
+    <style>select, button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    p {
+        padding: 20px;
+        color: darkred;
+    }
+    </style>
+
+{% endblock %}
