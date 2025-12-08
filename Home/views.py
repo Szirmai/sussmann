@@ -6,12 +6,19 @@ from datetime import date
 from .forms import ContactForm
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from datetime import datetime
+from django.core.mail import send_mail
+from . import models
+
 
 def home_view(request):
     products = Product.objects.all().order_by('-created_at')[0:3]
     deals = DealOfMonth.objects.filter(exp_date__gte = date.today()).order_by('-created_at')[:1]
     youtubes = YouTube.objects.all().order_by('-created_at')[0:1]
     quotes = Quotes.objects.all().order_by('-created_at')
+    news = models.New.objects.all().order_by('-date')[0:3]
     title = 'Home'
 
     context = {'products': products,
@@ -19,6 +26,7 @@ def home_view(request):
                'youtubes': youtubes,
                'quotes': quotes,
                'title': title,
+               'news': news,
                }
     return render(request, 'index.html', context)
 
@@ -70,7 +78,28 @@ def Contact(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            form.save()  
+            contact = form.save()
+            html = render_to_string("contact_email.html", {
+                "title": "Köszönjük, hogy felvette velünk a kapcsolatot!",
+                "customer_name": contact.name,   # <--- a mentett objektum neve
+                "year": datetime.now().year,
+            })
+
+            msg = EmailMultiAlternatives(
+                subject="Kapcsolatfelvétel visszaigazolása",
+                body="A leveled HTML-t tartalmaz.",
+                from_email="noreply@sussmann.hu",
+                to=[contact.email],   # <--- a mentett objektum e-mailje
+            )
+            msg.attach_alternative(html, "text/html")
+            msg.send()
+            send_mail(
+                subject="Új megkeresés érkezett",
+                message=f"új megkeresés érkezett innen: {contact.email}",
+                from_email="noreply@sussmann.hu",
+                recipient_list=["notices@sussmann.hu"],
+                fail_silently=False,
+            )
             return redirect('success')  # Success page
     else:
         form = ContactForm() 
@@ -98,5 +127,56 @@ def subscribe_view(request):
             email=subsc
         )
         messages.success(request, 'A feliratkozás megtörtént!')
+        html = render_to_string("subsciption_email.html", {
+            "title": "Feliratkozás megerősítve!",
+               "subscriber_email": subsc,
+               "year": datetime.now().year,
+         })
 
+        msg = EmailMultiAlternatives(
+             subject="Köszönjük, hogy feliratkoztál!",
+             body="A leveled HTML-t tartalmaz.",
+             from_email="noreply@sussmann.hu",
+             to=[subsc],
+         )
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+        send_mail(
+            subject="Új feliratkozás érkezett",
+            message=f"új feliratkozás érkezett innen: {subsc}",
+            from_email="noreply@sussmann.hu",
+            recipient_list=["notices@sussmann.hu"],
+            fail_silently=False,
+        )
+
+        messages.success(request, "Nézze az emailjeit!")
+    return redirect('home')
+
+
+def news(request):
+    news = models.New.objects.all().order_by('-date')
+    title = 'Írások'
+    context = {
+        'news': news,
+        'title': title,
+    }
+    return render(request, 'news.html', context)
+
+def new(request, pk):
+    new = models.New.objects.get(id=pk)
+    more = models.New.objects.all().order_by('-date')[0:15]
+    category = 'Kés Ápolás'
+
+    title = 'Írások - ' + new.title
+    context = {
+        'title': title,
+        'category': category,
+        'new': new,
+        'more': more,
+    }
+
+
+    return render(request, 'single-news.html', context)
+
+def policy(request):
     return redirect('home')

@@ -11,5 +11,8 @@ urlpatterns = [
     path('contacts/', views.contacts, name='contacts'),
     path('contact/<int:contact_id>/', views.contact, name='contact_dash'),
     path('edit/shipping-cost/<int:shipping_id>', views.edit_shipping, name='edit_shipping'),
+    path('dash/news', views.new_dash, name='new_dash'),
     path('logout/', views.logout, name='logout'),
+    path('add/new', views.add_new, name="add_new"),
+    path('edit/new/<str:pk>', views.edit_new, name='edit_new'),
 ]

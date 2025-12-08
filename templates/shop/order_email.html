@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rendelés visszaigazolása</title>
+  </head>
+  <body style="margin:0; padding:0; background:#f4f4f4; font-family:Arial, sans-serif;">
+
+    <!-- MAIN WRAPPER -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
+      <tr>
+        <td align="center">
+
+          <!-- CARD -->
+          <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 0 10px rgba(0,0,0,0.08);">
+
+            <!-- HEADER -->
+            <tr>
+              <td style="background:#051922; padding:25px; text-align:center;">
+                <h1 style="color:white; margin:0; font-size:26px; font-weight:700;">
+                  {{ title }}
+                </h1>
+              </td>
+            </tr>
+
+            <!-- BODY -->
+            <tr>
+              <td style="padding:25px; color:#333; font-size:16px; line-height:1.6;">
+                
+                <p style="margin-bottom:10px;">Kedves <strong>{{ customer_name }}</strong>!</p>
+                <p>Köszönjük a rendelését. Az alábbiakban megtalálja a rendelés részleteit:</p>
+
+                <!-- ORDER ID -->
+                <p style="background:#f28123; color:white; padding:10px 15px; border-radius:6px; display:inline-block;">
+                  <strong>Rendelési azonosító:</strong> {{ order.order_id }}
+                </p>
+
+                <!-- ITEMS -->
+                <h3 style="margin-top:25px; color:#051922;">Rendelt termékek:</h3>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  {% for item in items %}
+                  <tr>
+                    <td style="padding:8px 0; border-bottom:1px solid #eee;">
+                      {{ item.product_name }} × {{ item.quantity }}
+                    </td>
+                    <td style="padding:8px 0; border-bottom:1px solid #eee; text-align:right;">
+                      {{ item.price }} Ft / db
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </table>
+
+                <!-- TOTAL -->
+                <p style="margin-top:20px; font-size:18px; font-weight:bold; color:#051922;">
+                  Összesen fizetendő: {{ total }} Ft
+                </p>
+
+                <!-- ADDRESSES -->
+                <h3 style="margin-top:25px; color:#051922;">Szállítási cím</h3>
+                <p style="margin:0 0 10px 0;">{{ shipping_address }}</p>
+
+                <h3 style="margin-top:25px; color:#051922;">Számlázási cím</h3>
+                <p style="margin:0 0 10px 0;">{{ billing_address }}</p>
+
+                <!-- INFO BOX -->
+                <div style="margin-top:20px; padding:15px; background:#051922; color:white; border-radius:8px;">
+                  <p style="margin:0; font-size:14px;">
+                    Fizetési mód: <strong style="color:#f28123;">{{ payment_method }}</strong>
+                  </p>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:20px; background:#f0f0f0; text-align:center; font-size:13px; color:#666;">
+                Ez egy automatikus üzenet. Kérjük, ne válaszoljon rá.<br>
+                © {{ year }} Sussmann.hu
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+</html>

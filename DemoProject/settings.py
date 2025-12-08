@@ -143,3 +143,12 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51OBNQZHiouEL49qYRe08ptSiRvuQnlq0RMKvffjRJywta2sOmRmADtsfZZTkOf5p1Bji5mo0SfVIn8gW6tegATNQ0069Pm1PCN'
 STRIPE_SECRET_KEY = 'sk_test_51OBNQZHiouEL49qYi7zsDvVqD97vKFUQeih4eTo2DdrgqpGCG6fUc9Pvd5lENCeA5oXs2H49pS5sXCTxoWoAFItg00tJ3PvYQt'
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "mail.sussmann.hu"
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = "noreply@sussmann.hu"
+EMAIL_HOST_PASSWORD = "NoReply01234"
+DEFAULT_FROM_EMAIL = "noreply@sussmann.hu"

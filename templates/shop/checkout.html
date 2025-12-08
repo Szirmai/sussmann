@@ -80,16 +80,18 @@
 						      <div class="card-body">
 						        <div class="billing-address-form">
 						        	<form action="" id="shipping-form">
+										<i>(GLS országon belül, külföldi rendelés esetén írjon email-t ide: info@sussmann.hu)</i><br><br>
 										{% csrf_token %}
 						        		<p><input type="text" name="shipping_address" placeholder="Cím" required></p>
     									<p><input type="text" name="phone" placeholder="* Telefonszám (+36 70 ... ....)" required></p>
 										<p><input type="text" name="email_trans" placeholder="* Email..." required></p>
     									<p><input type="text" name="state_num" placeholder="Irányítószám"></p>
     									<p><input type="text" name="door_num" placeholder="Ajtó / Emelet / Megjegyzés"></p>
-										<p><input type="checkbox" name="checkbox">Személyes átvétel: Budapest beváros vagy Verőce (További egyeztetés a rendelés leadása után emailben.)<br>Ha messzebb laksz de nem akarsz otthon várni a csomagra, akkor kattintsd be ezt a gombot és megbeszéljük...(foxpost, GLS Box, stb...)</p>
+										<p><input type="checkbox" name="checkbox" required>Elfogadom az <a href="{% url 'policy' %}">adavédelmi tájékozazó</a>-ba foglaltakat! *</p>
 										<p style="color: red;"></p>
 						        	</form>
 						        </div>
+							
 						      </div>
 						    </div>
 						  </div>

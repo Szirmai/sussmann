@@ -1,0 +1,30 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-04">
+            <h2>Írás feltöltése</h2>
+            <form method="POST" enctype="multipart/form-data" style="padding: 30px" action="{% url 'edit_new' new.id %}">
+                {% csrf_token %}
+                {{form}}<br><br>
+                <button type="submit">Mentés!</button>
+            </form>
+        </div>
+    </div>
+
+    <style>select, button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: var(--primary);
+        color: white;
+    }
+    </style>
+
+
+    {% endblock %}

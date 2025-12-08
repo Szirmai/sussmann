@@ -289,7 +289,43 @@
 
 </div>
 
-	
+	<div class="row">
+		<div class="card-03">
+			<h2>Kiadások </h2>
+			<a style="padding: 20px" href="{% url 'add_cost' %}">Költség hozzáadása +</a>
+			<table id="customers">
+				<thead>
+			  <tr class="pos-r">
+				<th>Megrendelő</th>
+				<th>Bevétel</th>
+				<th>Dátum</th>
+
+
+			  </tr>
+			  </thead>
+			  {% for order in income_item %}
+			  <a href=""><tr>				
+				<td>{{order.name}}</td>
+				<td>{{order.brutto_price}}</td>
+				<td>{{order.created_at}}</td>
+
+
+			</tr></a>
+			{% empty %}
+			<tr>
+				<td></td>
+
+				<td>Nincsenek kiadások...</td>
+
+			  </tr>
+			{% endfor %}
+
+			
+  
+			 
+			</table>
+		</div>
+	</div>
 	
 	<div class="row">
 		<div class="card-03">

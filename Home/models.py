@@ -24,6 +24,14 @@ class Product(models.Model):
     def __str__(self):
         return self.name  # String representation of the product (display name in admin)
     
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to='products/')
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+
 class DealOfMonth(models.Model):
     percent = models.IntegerField(default=20)
     per = models.CharField(max_length=50, default="...", null=True, blank=True)
@@ -99,3 +107,22 @@ class Subsc(models.Model):
 
     def __str__(self):
         return self.email
+    
+
+class CategoryNew(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+    
+
+class New(models.Model):
+    author = models.CharField(max_length=200, null=True)
+    date = models.DateField(auto_now_add=True)
+    category = models.ForeignKey(CategoryNew, on_delete=models.CASCADE, null=True)
+    title = models.CharField(max_length=200, null=True)
+    text = models.TextField(max_length=10000, null=True)
+    image = models.ImageField(upload_to='mews/', null=True)
+
+    def __str__(self):
+        return self.title

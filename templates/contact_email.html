@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kapcsolatfelvétel visszaigazolása</title>
+</head>
+<body style="margin:0; padding:0; background:#f6f6f6; font-family:Arial, sans-serif;">
+
+    <table width="100%" style="padding:20px 0; background:#f6f6f6;">
+        <tr>
+            <td align="center">
+
+                <table width="600" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+
+                    <!-- HEADER -->
+                    <tr>
+                        <td style="background:#051922; padding:20px; text-align:center;">
+                            <h1 style="color:white; margin:0; font-size:24px; font-weight:600;">
+                                {{ title }}
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <!-- BODY -->
+                    <tr>
+                        <td style="padding:30px; color:#051922; font-size:16px; line-height:1.6;">
+                            <p style="margin:0 0 16px 0; font-size:18px;">
+                                <strong>Szép napot, {{ customer_name }}!</strong>
+                            </p>
+
+                            <p style="margin:0 0 20px 0;">
+                                Köszönjük, hogy felvette velünk a kapcsolatot!  
+                                Hamarosan felvesszük Önnel a kapcsolatot, hogy minden kérdésére válaszoljunk.
+                            </p>
+
+                            <p style="margin:24px 0 0 0;">
+                                <strong>Üdvözlettel:</strong><br>
+                                <i>Sussmann Knifeworks</i>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="background:#f28123; padding:15px; text-align:center; color:#051922; font-size:14px;">
+                            © {{ year }} Sussmann Knifeworks – Minden jog fenntartva.
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

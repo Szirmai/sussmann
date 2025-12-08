@@ -10,4 +10,7 @@ urlpatterns = [
     path('contact/', views.Contact, name='contact'),
     path('success/', views.Success, name='success'),
     path('scubsc/', views.subscribe_view, name='subsc'),
+    path('news/', views.news, name='news'),
+    path('new/<str:pk>', views.new, name='new'),
+    path('adatvedelmi-tajekoztato/', views.policy, name='policy'),
 ]

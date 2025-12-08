@@ -36,6 +36,9 @@
                     <li class="tiny-text-flex"><a href="{% url 'product_list' %}"><span class="material-symbols-outlined">inventory_2</span></a>
 						<small>Termékek</small>
 					</li>
+					<li class="tiny-text-flex"><a href="{% url 'new_dash' %}"><span class="material-symbols-outlined">breaking_news_alt_1</span></a>
+						<small>írások</small>
+					</li>
 					<li class="tiny-text-flex"><a href="{% url 'contacts' %}"><span class="material-symbols-outlined">mail</span></a>
 						<small>kontakt</small>
 					</li>
@@ -73,6 +76,12 @@
 						<h2 class="link-text">Termék feltöltése</h2>
 					</a>
 				</li>
+				<li class="nav-item">
+					<a href="{% url 'new_dash' %}" class="nav-link">
+						<span class="material-symbols-outlined">breaking_news_alt_1</span>
+						<h2 class="link-text">írások</h2>
+					</a>
+				</li>
 
                 <li class="nav-item">
 					<a href="{% url 'product_list' %}" class="nav-link">
@@ -103,12 +112,12 @@
 				</li>
 
 
-                <li class="nav-item">
+                <!--<li class="nav-item">
 					<a href="{% url 'logout' %}" class="nav-link">
 						<span class="material-symbols-outlined">logout</span>
 						<h2 class="link-text">Kijelentkezés</h2>
 					</a>
-				</li>
+				</li>-->
 
 			</ul>
 		</div>

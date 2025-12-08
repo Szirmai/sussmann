@@ -1,0 +1,46 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+	{% block content %}
+
+    <div class="row">
+        <div class="card-03">
+            <h2>Írások </h2> 
+            <h3 style="padding-left: 20px"><a href="{% url 'add_new' %}">Add +</a></h3>
+            <table id="customers">
+                <thead>
+              <tr class="pos-r">
+                <th>Cím</th>
+                <th>Dátum</th>
+                <th>író</th>
+                <th>Kategória</th>
+                <th>ID</th>
+              </tr>
+              </thead>
+{% for new in news %}
+              <tr>
+                
+                <td><a href="{% url 'edit_new' new.id %}" style="color: black;">{{new.title}}</a></td>
+                <td><a href="{% url 'edit_new' new.id %}" style="color: black;">{{new.date}}</a></td>
+                <td><a href="{% url 'edit_new' new.id %}" style="color: black;">{{new.author}}</a></td>
+                <td><a href="{% url 'edit_new' new.id %}" style="color: black;">{{new.category}}</a></td>
+                <td><a href="{% url 'edit_new' new.id %}" style="color: black;">{{new.id}}</a></td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Nincsen egy írás sem...</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <!--endfor-->{% endfor %}			  
+             
+            </table>
+        </div>
+    </div>
+  
+
+              
+{% endblock %}

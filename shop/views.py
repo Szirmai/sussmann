@@ -9,6 +9,10 @@ from django.contrib import messages
 from .models import *
 from .forms import *
 from django.utils import timezone
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from datetime import datetime
+from django.core.mail import send_mail
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -87,6 +91,27 @@ def cart_view(request):
     # Calculate Összesen (Total) including shipping
     összesen_price = bruttó_price + shipping_cost
 
+    cart = request.session.get("cart", {})
+    removed_items = []
+
+    for product_id_str, item_data in list(cart.items()):
+        try:
+            product_id = int(product_id_str)
+            product = get_object_or_404(Product, id=product_id)
+        except ValueError:
+            continue
+
+        # Ha a termék nem elérhető vagy nincs elég készleten, töröljük a kosárból
+        if not product.available or product.stock < item_data["quantity"]:
+            removed_items.append(product.name)
+            del cart[product_id_str]
+
+    # Ha volt törölt termék, visszairányítunk a kosárhoz
+    if removed_items:
+        request.session["cart"] = cart  # frissítjük a sessiont
+        messages.error(request, f"Ezeket a termékeket eltávolítottuk a kosárból, mert jelenleg nem elérhetők: {', '.join(removed_items)}")
+        return redirect("cart_view")
+
     # Send the cart data to the template
     return render(request, 'shop/cart.html', {
         'cart_items': cart_items,
@@ -103,6 +128,27 @@ def checkout(request):
     nettó_price = 0
     shipping_cost = get_object_or_404(ShippingCost, id=1).cost
     vat_rate = 0.27  # VAT rate (27% for Hungary)
+    
+    cart = request.session.get("cart", {})
+    removed_items = []
+
+    for product_id_str, item_data in list(cart.items()):
+        try:
+            product_id = int(product_id_str)
+            product = get_object_or_404(Product, id=product_id)
+        except ValueError:
+            continue
+
+        # Ha a termék nem elérhető vagy nincs elég készleten, töröljük a kosárból
+        if not product.available or product.stock < item_data["quantity"]:
+            removed_items.append(product.name)
+            del cart[product_id_str]
+
+    # Ha volt törölt termék, visszairányítunk a kosárhoz
+    if removed_items:
+        request.session["cart"] = cart  # frissítjük a sessiont
+        messages.error(request, f"Ezeket a termékeket eltávolítottuk a kosárból, mert jelenleg nem elérhetők: {', '.join(removed_items)}")
+        return redirect("cart_view")
 
     # Calculate total price for each item based on quantity
     for item_id, item_data in cart.items():
@@ -161,10 +207,42 @@ def create_order(request):
             email_trans = request.POST.get("email_trans", "").strip()
             personal = request.POST.get("checkbox", "") == "on"
 
-            required_fields = [name, email, payment_method, billing_address, phone, email_trans]
+            required_fields = [name, email, payment_method, billing_address, phone, email_trans, personal]
             if not all(required_fields):
                 messages.error(request, 'Sikertelen megrendelés! Kérlek Töltsd ki a kötelező mezőket!!! *-gal vannak jelölve!')
                 return redirect('checkout')
+            
+
+            
+            cart = request.session.get("cart", {})
+            #if an item in cart's product.available is no then return to cart and remove the item from cart
+            # --- #2: Ellenőrzés: van-e elérhetetlen termék a kosárban ---
+            unavailable_items = []
+            for product_id_str, item_data in cart.items():
+                try:
+                    product_id = int(product_id_str)
+                    product = get_object_or_404(Product, id=product_id)
+                except ValueError:
+                    continue
+
+                # ha a termék nem elérhető vagy nincs készletben
+                if not product.available or product.stock < item_data["quantity"]:
+                    unavailable_items.append(product.name)
+
+            if unavailable_items:
+                messages.error(request, f"Ezek a termékek jelenleg nem elérhetők: {', '.join(unavailable_items)}")
+                # Töröljük ezeket a kosárból
+                for product_name in unavailable_items:
+                    for pid, item in list(cart.items()):
+                        if item["name"] == product_name:
+                            del cart[pid]
+                request.session["cart"] = cart  # frissítsük a sessiont
+                return redirect("cart_view")  # vissza a kosár oldalra
+
+
+            #if an item is ordered  decrease the product.stock with 1 and if product.stock is 0 change the product.avalable to no
+
+
                 
 
             # Convert numbers properly
@@ -175,7 +253,7 @@ def create_order(request):
             door_num = int(door_num) if door_num and door_num.isdigit() else None
 
             # Retrieve cart data
-            cart = request.session.get("cart", {})
+            
 
             # Price calculations
             nettó_price = 0
@@ -228,6 +306,13 @@ def create_order(request):
                     price=item["price"],
                 )
 
+                # #2: készlet kezelése
+                product.stock -= item["quantity"]
+                if product.stock <= 0:
+                    product.stock = 0
+                    product.available = False
+                product.save()
+
             # Create billing address
             BillingAddress.objects.create(
                 order=order,
@@ -255,6 +340,34 @@ def create_order(request):
 
             messages.success(request, 'Sikeres megrendelés!')
             # innen kell emilt kuldeni ....
+            html = render_to_string("shop/order_email.html", {
+                "title": "Rendelése megérkezett!",
+                "order": order,             # Teljes order objektum
+                "items": order.items.all(),  # Összes rendelési tétel
+                "customer_name": name,
+                "total": összesen_price,
+                "payment_method": payment_method,
+                "shipping_address": shipping_address,
+                "billing_address": billing_address,
+                "year": datetime.now().year,
+            })
+
+            msg = EmailMultiAlternatives(
+                subject="Rendelés visszaigazolása",
+                body="A leveled HTML-t tartalmaz.",
+                from_email="noreply@sussmann.hu",
+                to=[email],   # <-- ide megy a vásárló email címe
+            )
+
+            msg.attach_alternative(html, "text/html")
+            msg.send()
+            send_mail(
+                subject="Új megrendelés érkezett",
+                message=f"Egy új rendelés érkezett a webáruházba.\nRendelő neve: {name}\nEmail: {email}",
+                from_email="noreply@sussmann.hu",
+                recipient_list=["notices@sussmann.hu"],
+                fail_silently=False,
+            )
             return JsonResponse({"success": True, "message": "Sikeres megrendelés!"})  # Return JSON response
         
         except Exception as e:

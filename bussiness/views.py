@@ -230,6 +230,9 @@ def home(request):
 # Új adat a frontendhez
     orders_count_daily_count = [daily_orders_count.get(day, 0) for day in days_daily]
 
+    income_item = Order.objects.filter(status="Kiszállítva").order_by('-created_at')
+
+
     context = {
         'costs': costs,
         'cost_value': cost_value,
@@ -252,6 +255,7 @@ def home(request):
         'chart_data_daily': mark_safe(json.dumps(revenues_daily)),  # JSON biztosítása
         'today': today_daily,  # A dátum megfelelő formázásban
         'chart_orders_daily_count': orders_count_daily_count,
+        'income_item': income_item,
     }
 
     return render(request, 'bus/home.html', context)

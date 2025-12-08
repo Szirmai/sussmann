@@ -7,6 +7,8 @@ from django.contrib import messages
 from Home.forms import *
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout
+from django import forms
+from Home.models import Product, ProductImage, New
 
 def is_admin(user):
     return user.is_authenticated and user.is_superuser  # Only superusers can access
@@ -56,14 +58,25 @@ def order_page(request, order_id):
 @user_passes_test(is_admin, login_url='/')
 def product_create(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)  # Request.FILES szükséges a képekhez
-        if form.is_valid():
-            form.save()
-            return redirect('product_list')  # Ha sikeres, átirányítjuk a termékek listájára
+        form = ProductForm(request.POST, request.FILES)
+        formset = ProductImageFormSet(request.POST, request.FILES, queryset=ProductImage.objects.none())
+
+        if form.is_valid() and formset.is_valid():
+            product = form.save()  # elmenti a fő képet is
+
+            # Többi kép mentése
+            for f in formset.cleaned_data:
+                if f:
+                    image = f['image']
+                    ProductImage.objects.create(product=product, image=image)
+
+            return redirect('product_list')
     else:
         form = ProductForm()
+        formset = ProductImageFormSet(queryset=ProductImage.objects.none())
 
-    return render(request, 'dash/upload-product.html', {'form': form})
+    return render(request, 'dash/upload-product.html', {'form': form, 'formset': formset})
+
 
 @user_passes_test(is_admin, login_url='/')
 def product_edit(request, product_id):
@@ -140,6 +153,47 @@ def edit_shipping(request, shipping_id):
                'note': note}
 
     return render(request, 'dash/edit.html', context)
+
+@user_passes_test(is_admin, login_url='/')
+def new_dash(request):
+    news = New.objects.all().order_by('-date')
+    context = {
+        'news': news,
+
+    }
+    return render(request, 'dash/new_dash.html', context)
+
+def edit_new(request, pk):
+    new = get_object_or_404(New, id=pk)  # get_object_or_404, hogy egyetlen példányt kapjunk
+
+    if request.method == 'POST':
+        form = NewForm(request.POST, request.FILES, instance=new)  # A formot az instance-szal kell tölteni
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'A művelet sikeres volt!')
+            return redirect('new_dash')  # Sikeres mentés után visszairányítjuk a listára
+    else:
+        form = NewForm(instance=new)  # A formot az instance-szal tölthetjük
+
+    context = {'new': new,
+               'form': form}
+    return render(request, 'dash/edit_new.html', context)
+
+def add_new(request):
+
+
+    if request.method == 'POST':
+        form = NewForm(request.POST, request.FILES)  # A formot az instance-szal kell tölteni
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'A művelet sikeres volt!')
+            return redirect('new_dash')  # Sikeres mentés után visszairányítjuk a listára
+    else:
+        form = NewForm()  # A formot az instance-szal tölthetjük
+
+    context = {
+               'form': form}
+    return render(request, 'dash/add_new.html', context)
 
 def logout(request):
     logout(request)

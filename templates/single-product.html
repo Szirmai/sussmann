@@ -40,22 +40,83 @@
 	<div class="single-product mt-150 mb-150">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-5">
-					<div class="single-product-img">
-						<img src="{{product.image.url}}" alt="">
-					</div>
-				</div>
+
+				
+
+<div class="col-md-5">
+    <div id="productCarousel" class="carousel slide" data-ride="carousel">
+
+        <div class="carousel-inner">
+            {% for img in product.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ img.image.url }}" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="Product image">
+                </div>
+            {% empty %}
+                <div class="carousel-item active">
+                    <img src="{% static 'assets/img/default.jpg' %}" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="Default image">
+                </div>
+            {% endfor %}
+        </div>
+
+<a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+    <i class="fas fa-chevron-left fa-2x" style="color:white;"></i>
+    <span class="sr-only">Previous</span>
+</a>
+
+<a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+    <i class="fas fa-chevron-right fa-2x" style="color:white;"></i>
+    <span class="sr-only">Next</span>
+</a>
+
+
+        <!-- Indicatorok -->
+        <ol class="carousel-indicators mt-2">
+            {% for img in product.images.all %}
+                <li data-target="#productCarousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"></li>
+            {% endfor %}
+        </ol>
+
+    </div>
+</div>
+
+<style>
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-image: none; /* eltávolítjuk a régi ikonokat */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;      /* kerek gomb */
+    background-color: rgba(0,0,0,0.5); /* félig átlátszó fekete */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: white;
+}
+
+.carousel-control-prev-icon::after {
+    content: '<';
+}
+
+.carousel-control-next-icon::after {
+    content: '>';
+}
+
+
+</style>
+
 				<div class="col-md-7">
 					<div class="single-product-content">
 						<h3>{{product.name}}</h3>
 						<p class="single-product-pricing"><span></span> {{product.price}} Ft</p>
-						<p>{{product.description}}</p>
-						<div class="single-product-form">
-							{% if product.available %}
+													{% if product.available %}
                 <a href="{% url 'cart_add' product.id %}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Kosárba</a>
             {% else %}
                 <p style="color: red; font-weight: bold;">Megvásárolva</p>
-            {% endif %}
+            {% endif %}<br>
+						<p style="padding-top: 20px">{{product.description|safe}}</p>
+						<div class="single-product-form">
+
 							<p><strong>Kategória: </strong><a href="{% url 'cat_page' product.categories.name %}">{{product.categories.name}}</a></p>
 						</div>
 					</div>

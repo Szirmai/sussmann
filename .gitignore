@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Django database
+db.sqlite3
+
+# Uploaded media files
+media/
+
+# Environment
+venv/
+.env
+
+# VSCode
+.vscode/
+
+# Others
+*.log
