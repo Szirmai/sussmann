@@ -56,18 +56,59 @@ def cart_remove(request, product_id):
     # Redirect back to the previous page
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
+
+
+def apply_coupon(request):
+    if request.method != "POST":
+        return redirect("cart_view")
+
+    code = request.POST.get("coupon_code", "").strip().upper()
+
+    if not code:
+        messages.error(request, "Nem adtál meg kuponkódot.")
+        return redirect("cart_view")
+
+    try:
+        coupon = Coupon.objects.get(code=code, active=True)
+    except Coupon.DoesNotExist:
+        messages.error(request, "Érvénytelen kuponkód.")
+        return redirect("cart_view")
+
+    # Kosár bruttó érték kiszámítása (egyszerűsítve)
+    cart = request.session.get("cart", {})
+    cart_total = 0
+
+    for item in cart.values():
+        cart_total += item["price"] * item["quantity"]
+
+    if not coupon.is_valid(cart_total):
+        messages.error(request, "Ez a kupon jelenleg nem használható.")
+        return redirect("cart_view")
+
+    # 👉 ITT kerül be a session-be
+    request.session["coupon_id"] = coupon.id
+
+    messages.success(request, "Kupon sikeresen alkalmazva!")
+    return redirect("cart_view")
+
+def remove_coupon(request):
+    request.session.pop("coupon_id", None)
+    messages.info(request, "Kupon eltávolítva.")
+    return redirect("cart_view")
+
+
 def cart_view(request):
     cart = request.session.get('cart', {})  # Get the cart from the session
     cart_items = []
     nettó_price = 0
-    shipping_cost = get_object_or_404(ShippingCost, id=1).cost
+    shipping_cost_obj = get_object_or_404(ShippingCost, id=1)
+    shipping_cost = shipping_cost_obj.cost
     vat_rate = 0.27
 
     # Calculate total price for each item based on quantity
     for item_id, item_data in cart.items():
         item = Product.objects.get(id=item_id)  # Get the product from the database
         gross_price = item_data['price']  # Gross price from the database
-        vat_rate = 0.27  # VAT rate (27% for Hungary)
         
         # Calculate Nettó (Net price) by removing VAT from the Gross price
         net_price = gross_price / (1 + vat_rate)
@@ -88,12 +129,10 @@ def cart_view(request):
     # Calculate Bruttó (Gross price) including VAT
     bruttó_price = nettó_price * (1 + vat_rate)
 
-    # Calculate Összesen (Total) including shipping
-    összesen_price = bruttó_price + shipping_cost
-
-    cart = request.session.get("cart", {})
+    # ---------------------------
+    # Ellenőrzés: termék elérhetőség
+    # ---------------------------
     removed_items = []
-
     for product_id_str, item_data in list(cart.items()):
         try:
             product_id = int(product_id_str)
@@ -101,101 +140,142 @@ def cart_view(request):
         except ValueError:
             continue
 
-        # Ha a termék nem elérhető vagy nincs elég készleten, töröljük a kosárból
         if not product.available or product.stock < item_data["quantity"]:
             removed_items.append(product.name)
             del cart[product_id_str]
 
-    # Ha volt törölt termék, visszairányítunk a kosárhoz
     if removed_items:
-        request.session["cart"] = cart  # frissítjük a sessiont
+        request.session["cart"] = cart
         messages.error(request, f"Ezeket a termékeket eltávolítottuk a kosárból, mert jelenleg nem elérhetők: {', '.join(removed_items)}")
         return redirect("cart_view")
 
+    # ---------------------------
+    # Kupon kezelés
+    # ---------------------------
+    coupon = None
+    discount_amount = 0
+    coupon_id = request.session.get("coupon_id")
+
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id, active=True)
+            # ellenőrizzük, hogy kosárértékre érvényes-e
+            if coupon.is_valid(bruttó_price):
+                if coupon.discount_type == "percent":
+                    discount_amount = bruttó_price * coupon.discount_value / 100
+                else:
+                    discount_amount = coupon.discount_value
+            else:
+                # ha már nem érvényes, töröljük a session-ből
+                request.session.pop("coupon_id", None)
+                coupon = None
+                discount_amount = 0
+        except Coupon.DoesNotExist:
+            request.session.pop("coupon_id", None)
+            coupon = None
+            discount_amount = 0
+
+    # Calculate total including shipping and discount
+    összesen_price = bruttó_price + shipping_cost - discount_amount
+
     # Send the cart data to the template
-    return render(request, 'shop/cart.html', {
+    context = {
         'cart_items': cart_items,
         'nettó_price': round(nettó_price, 2),
         'bruttó_price': round(bruttó_price, 2),
         'shipping_cost': shipping_cost,
         'összesen_price': round(összesen_price, 2),
-    })
+        'coupon': coupon,
+        'discount_amount': round(discount_amount, 2)
+    }
+
+    return render(request, 'shop/cart.html', context)
 
 
 def checkout(request):
-    cart = request.session.get('cart', {})  # Get the cart from the session
+    cart = request.session.get('cart', {})
     cart_items = []
     nettó_price = 0
-    shipping_cost = get_object_or_404(ShippingCost, id=1).cost
-    vat_rate = 0.27  # VAT rate (27% for Hungary)
-    
-    cart = request.session.get("cart", {})
-    removed_items = []
+    shipping_cost_obj = get_object_or_404(ShippingCost, id=1)
+    shipping_cost = shipping_cost_obj.cost
+    vat_rate = 0.27
 
+    removed_items = []
     for product_id_str, item_data in list(cart.items()):
         try:
             product_id = int(product_id_str)
             product = get_object_or_404(Product, id=product_id)
         except ValueError:
             continue
-
-        # Ha a termék nem elérhető vagy nincs elég készleten, töröljük a kosárból
         if not product.available or product.stock < item_data["quantity"]:
             removed_items.append(product.name)
             del cart[product_id_str]
 
-    # Ha volt törölt termék, visszairányítunk a kosárhoz
     if removed_items:
-        request.session["cart"] = cart  # frissítjük a sessiont
-        messages.error(request, f"Ezeket a termékeket eltávolítottuk a kosárból, mert jelenleg nem elérhetők: {', '.join(removed_items)}")
+        request.session["cart"] = cart
+        messages.error(request, f"Ezeket a termékeket eltávolítottuk a kosárból: {', '.join(removed_items)}")
         return redirect("cart_view")
 
-    # Calculate total price for each item based on quantity
     for item_id, item_data in cart.items():
-        item = get_object_or_404(Product, id=item_id)  # Get the product from the database
-        gross_price = item_data['price']  # Gross price from the database
-
-        # Calculate Nettó (Net price) by removing VAT from the Gross price
+        item = get_object_or_404(Product, id=item_id)
+        gross_price = item_data['price']
         net_price = gross_price / (1 + vat_rate)
-        
-        # Calculate the total price of the item based on quantity
-        item_total_price = net_price * item_data['quantity']  # Nettó price * quantity
-        nettó_price += item_total_price  # Add to Nettó price
-
+        item_total_price = net_price * item_data['quantity']
+        nettó_price += item_total_price
         cart_items.append({
-            'id': item_id,  # Add product_id here
+            'id': item_id,
             'name': item_data['name'],
             'quantity': item_data['quantity'],
             'price': gross_price,
-            'net_price': round(item_total_price, 2),  # Total price without VAT (Nettó)
-            'total_price': round(item_total_price * (1 + vat_rate), 2)  # Total price with VAT (Bruttó)
+            'net_price': round(item_total_price, 2),
+            'total_price': round(item_total_price * (1 + vat_rate), 2)
         })
 
-    # Calculate Bruttó (Gross price) including VAT
     bruttó_price = nettó_price * (1 + vat_rate)
 
-    # Calculate Összesen (Total) including shipping
-    összesen_price = bruttó_price + shipping_cost
+    # --------------------------
+    # Kupon kezelés
+    # --------------------------
+    coupon = None
+    discount_amount = 0
+    coupon_id = request.session.get("coupon_id")
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id, active=True)
+            if coupon.is_valid(bruttó_price):
+                if coupon.discount_type == "percent":
+                    discount_amount = bruttó_price * coupon.discount_value / 100
+                else:
+                    discount_amount = coupon.discount_value
+            else:
+                request.session.pop("coupon_id", None)
+                coupon = None
+        except Coupon.DoesNotExist:
+            request.session.pop("coupon_id", None)
+            coupon = None
 
-    title = 'Rendelés Véglegesítése!'
+    összesen_price = bruttó_price + shipping_cost - discount_amount
 
     context = {
-        'title': title,
+        'title': 'Rendelés Véglegesítése!',
         'cart_items': cart_items,
         'nettó_price': round(nettó_price, 2),
         'bruttó_price': round(bruttó_price, 2),
         'összesen_price': round(összesen_price, 2),
-        'shipping_cost': round(shipping_cost, 2)
+        'shipping_cost': round(shipping_cost, 2),
+        'coupon': coupon,
+        'discount_amount': round(discount_amount, 2)
     }
 
     return render(request, "shop/checkout.html", context)
 
 
 
+
 def create_order(request):
     if request.method == "POST":
         try:
-            # Get form data and sanitize input
+            # --- Get form data and sanitize input ---
             name = request.POST.get("name", "").strip()
             email = request.POST.get("email", "").strip()
             payment_method = request.POST.get("payment_method", "").strip()
@@ -209,14 +289,12 @@ def create_order(request):
 
             required_fields = [name, email, payment_method, billing_address, phone, email_trans, personal]
             if not all(required_fields):
-                messages.error(request, 'Sikertelen megrendelés! Kérlek Töltsd ki a kötelező mezőket!!! *-gal vannak jelölve!')
+                messages.error(request, 'Sikertelen megrendelés! Kérlek töltsd ki a kötelező mezőket!')
                 return redirect('checkout')
-            
 
-            
             cart = request.session.get("cart", {})
-            #if an item in cart's product.available is no then return to cart and remove the item from cart
-            # --- #2: Ellenőrzés: van-e elérhetetlen termék a kosárban ---
+
+            # --- Check unavailable items ---
             unavailable_items = []
             for product_id_str, item_data in cart.items():
                 try:
@@ -225,59 +303,66 @@ def create_order(request):
                 except ValueError:
                     continue
 
-                # ha a termék nem elérhető vagy nincs készletben
                 if not product.available or product.stock < item_data["quantity"]:
                     unavailable_items.append(product.name)
 
             if unavailable_items:
                 messages.error(request, f"Ezek a termékek jelenleg nem elérhetők: {', '.join(unavailable_items)}")
-                # Töröljük ezeket a kosárból
                 for product_name in unavailable_items:
                     for pid, item in list(cart.items()):
                         if item["name"] == product_name:
                             del cart[pid]
-                request.session["cart"] = cart  # frissítsük a sessiont
-                return redirect("cart_view")  # vissza a kosár oldalra
+                request.session["cart"] = cart
+                return redirect("cart_view")
 
-
-            #if an item is ordered  decrease the product.stock with 1 and if product.stock is 0 change the product.avalable to no
-
-
-                
-
-            # Convert numbers properly
+            # --- Convert numbers ---
             state_num = request.POST.get("state_num")
             state_num = int(state_num) if state_num and state_num.isdigit() else None
 
             door_num = request.POST.get("door_num")
             door_num = int(door_num) if door_num and door_num.isdigit() else None
 
-            # Retrieve cart data
-            
-
-            # Price calculations
+            # --- Price calculations ---
             nettó_price = 0
-            shipping_cost_obj = get_object_or_404(ShippingCost, id=1)  # ✅ ShippingCost objektum
+            vat_rate = 0.27
+            shipping_cost_obj = get_object_or_404(ShippingCost, id=1)
             shipping_cost = shipping_cost_obj.cost
-            vat_rate = 0.27  # VAT rate (27% for Hungary)
 
             for product_id_str, item_data in cart.items():
-                try:
-                    product_id = int(product_id_str)  # ✅ Stringből int konvertálás
-                    product = get_object_or_404(Product, id=product_id)  # ✅ Termék lekérése
-                except ValueError:
-                    print(f"Hibás product ID: {product_id_str}")  # Debugging
-                    continue  # Ha a termék ID rossz, kihagyjuk ezt az elemet
-                
+                product_id = int(product_id_str)
+                product = get_object_or_404(Product, id=product_id)
                 gross_price = item_data["price"]
                 net_price = gross_price / (1 + vat_rate)
                 item_total_price = net_price * item_data["quantity"]
                 nettó_price += item_total_price
 
             bruttó_price = nettó_price * (1 + vat_rate)
-            összesen_price = bruttó_price + shipping_cost
 
-            # Create the order
+            # --- Coupon logic (outside loop!) ---
+            coupon = None
+            discount_amount = 0
+            coupon_id = request.session.get("coupon_id")
+            if coupon_id:
+                try:
+                    coupon = Coupon.objects.get(id=coupon_id, active=True)
+                    if coupon.is_valid(bruttó_price):
+                        if coupon.discount_type == "percent":
+                            discount_amount = bruttó_price * coupon.discount_value / 100
+                        else:
+                            discount_amount = coupon.discount_value
+
+                        coupon.used_count += 1
+                        coupon.save()
+                    else:
+                        request.session.pop("coupon_id", None)
+                        coupon = None
+                except Coupon.DoesNotExist:
+                    request.session.pop("coupon_id", None)
+                    coupon = None
+
+            összesen_price = bruttó_price + shipping_cost - discount_amount
+
+            # --- Create Order ---
             order = Order.objects.create(
                 name=name,
                 email=email,
@@ -287,33 +372,32 @@ def create_order(request):
                 tax=vat_rate,
                 shipping_cost=shipping_cost_obj,
                 brutto_price=bruttó_price,
-                net_price=nettó_price,  # 🔄 Javítva (net_price helyett nettó_price kell)
+                net_price=nettó_price,
+                coupon=coupon,
+                discount_amount=discount_amount
             )
 
-            # Create order items
+            # --- Create Order Items ---
             for product_id_str, item in cart.items():
-                try:
-                    product_id = int(product_id_str)  # ✅ Konverzió
-                    product = get_object_or_404(Product, id=product_id)  # ✅ Helyesen lekérve a termék
-                except ValueError:
-                    continue  # Ha valamiért nem sikerül, kihagyjuk az elemet
-                
+                product_id = int(product_id_str)
+                product = get_object_or_404(Product, id=product_id)
+
                 OrderItem.objects.create(
                     order=order,
-                    product=product,  # ✅ Most már minden OrderItem-hez lesz termék
+                    product=product,
                     product_name=item["name"],
                     quantity=item["quantity"],
                     price=item["price"],
                 )
 
-                # #2: készlet kezelése
+                # --- Update stock ---
                 product.stock -= item["quantity"]
                 if product.stock <= 0:
                     product.stock = 0
                     product.available = False
                 product.save()
 
-            # Create billing address
+            # --- Create Billing Address ---
             BillingAddress.objects.create(
                 order=order,
                 company=company,
@@ -324,7 +408,7 @@ def create_order(request):
                 payment_deadline=timezone.now(),
             )
 
-            # Create shipping address
+            # --- Create Shipping Address ---
             ShippingAddress.objects.create(
                 order=order,
                 address=shipping_address,
@@ -335,15 +419,15 @@ def create_order(request):
                 personal=personal,
             )
 
-            # Clear the cart session
+            # --- Clear cart session ---
             request.session["cart"] = {}
-
             messages.success(request, 'Sikeres megrendelés!')
-            # innen kell emilt kuldeni ....
+
+            # --- Send emails ---
             html = render_to_string("shop/order_email.html", {
                 "title": "Rendelése megérkezett!",
-                "order": order,             # Teljes order objektum
-                "items": order.items.all(),  # Összes rendelési tétel
+                "order": order,
+                "items": order.items.all(),
                 "customer_name": name,
                 "total": összesen_price,
                 "payment_method": payment_method,
@@ -356,11 +440,11 @@ def create_order(request):
                 subject="Rendelés visszaigazolása",
                 body="A leveled HTML-t tartalmaz.",
                 from_email="noreply@sussmann.hu",
-                to=[email],   # <-- ide megy a vásárló email címe
+                to=[email],
             )
-
             msg.attach_alternative(html, "text/html")
             msg.send()
+
             send_mail(
                 subject="Új megrendelés érkezett",
                 message=f"Egy új rendelés érkezett a webáruházba.\nRendelő neve: {name}\nEmail: {email}",
@@ -368,11 +452,11 @@ def create_order(request):
                 recipient_list=["notices@sussmann.hu"],
                 fail_silently=False,
             )
-            return JsonResponse({"success": True, "message": "Sikeres megrendelés!"})  # Return JSON response
-        
-        except Exception as e:
-            print("Error in create_order:", str(e))  # Log error in the Django terminal
-            return JsonResponse({"success": False, "error": str(e)}, status=500)  # Return JSON error response
 
-    messages.error(request, 'Sikertelen megrendelés!')
+            return JsonResponse({"success": True, "message": "Sikeres megrendelés!"})
+
+        except Exception as e:
+            print("Error in create_order:", str(e))
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)

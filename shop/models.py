@@ -2,6 +2,63 @@ from django.db import models
 from django.contrib.auth.models import User  # For author
 import uuid
 from Home.models import Product
+from django.utils import timezone
+
+
+class Coupon(models.Model):
+    code = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
+    DISCOUNT_TYPE_CHOICES = (
+        ('percent', 'Százalékos'),
+        ('fixed', 'Fix összeg'),
+    )
+    discount_type = models.CharField(
+        max_length=10,
+        choices=DISCOUNT_TYPE_CHOICES
+    )
+    discount_value = models.PositiveIntegerField(
+        help_text="Százalék vagy forint érték"
+    )
+
+    active = models.BooleanField(default=True)
+
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+
+    max_uses = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Összesen hányszor használható (üres = végtelen)"
+    )
+    used_count = models.PositiveIntegerField(default=0)
+
+    min_cart_value = models.PositiveIntegerField(
+        default=0,
+        help_text="Minimum kosárérték (Ft)"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self, cart_total):
+        now = timezone.now()
+
+        if not self.active:
+            return False
+        if not (self.valid_from <= now <= self.valid_to):
+            return False
+        if self.max_uses is not None and self.used_count >= self.max_uses:
+            return False
+        if cart_total < self.min_cart_value:
+            return False
+
+        return True
+
+    def __str__(self):
+        return self.code
+
 
 class ShippingCost(models.Model):
     cost = models.IntegerField(default=2500, null=True)
@@ -34,6 +91,8 @@ class Order(models.Model):
     status = models.CharField(max_length=50, null=True, choices=STATUS_CHOICES, default="Új")
     created_at = models.DateTimeField(auto_now_add=True)
     tax = models.CharField(max_length=200, null=True)
+    coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
+    discount_amount = models.IntegerField(default=0)
 
 
 class OrderItem(models.Model):

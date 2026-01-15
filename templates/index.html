@@ -1,6 +1,7 @@
 
 {% extends 'base.html' %}
 {% load static %}
+{% load number_filters  %}
 	{% block content %}
 
 	<!-- search area -->
@@ -23,16 +24,16 @@
 	<!-- end search area -->
 
 	<!-- hero area -->
-	<div class="hero-area hero-bg" style="background-image: url('/media/products/IMG_1345.jpg');">
+	<div class="hero-area hero-bg" style="background-image: url('/media/products/gg.jpg');">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-9 offset-lg-2 text-center">
 					<div class="hero-text">
 						<div class="hero-text-tablecell">
-							<p class="subtitle">Sussmann Knifeworks</p>
-							<h1>Kézműves Termékek</h1>
+							<p class="subtitle">Kézműves Kések</p>
+							<h1>SUSSMANN KNIFEWORKS</h1>
 							<div class="hero-btns">
-								<a href="{% url 'shop' %}" class="boxed-btn">Bolt</a>
+								<a href="{% url 'shop' %}" class="boxed-btn">Shop</a>
 								<a href="{% url 'contact' %}" class="bordered-btn">Kapcsolat</a>
 							</div>
 						</div>
@@ -113,7 +114,7 @@
             </div>
             <h3>{{ product.name }}</h3>
             <p class="product-price">
-                <span></span> {{ product.price }} Ft
+                <span></span> {{ product.price|intspace }} Ft
             </p>
             {% if product.available %}
                 <a href="{% url 'cart_add' product.id %}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Kosárba</a>

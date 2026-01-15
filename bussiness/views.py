@@ -14,6 +14,11 @@ import json
 from django.utils.safestring import mark_safe
 # Create your views here.
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.utils.safestring import mark_safe
+from Home.models import Product
+
+
 
 @login_required
 def add_cost(request):
@@ -101,161 +106,236 @@ def delete_cost_cat(request, cost_id):
     messages.error(request, "Hiba történt, próbáld újra!")
     return redirect('add_cost')
 
+
+
+
 @login_required
 def home(request):
-    orders = Order.objects.all()
-    
-    # Az összes rendelés teljes árának összegzése
-    total_cost = sum(order.all_cost for order in orders if order.all_cost is not None and order.status=="Kiszállítva")
-    costs = Cost.objects.all().order_by('-created_at')
+    # =====================
+    # ÉV KEZELÉS
+    # =====================
+    current_year = timezone.now().year
+    selected_year = request.GET.get("year", current_year)
 
-    # Teljes költség összege
-    cost_value = sum(cost.cost for cost in costs)
+    try:
+        selected_year = int(selected_year)
+    except ValueError:
+        selected_year = current_year
 
-    # CostType szerint csoportosított költségek (eredeti adatok megtartása)
+    # =====================
+    # ELÉRHETŐ ÉVEK
+    # =====================
+    order_years = [d.year for d in Order.objects.dates('created_at', 'year', order='DESC')]
+    cost_years = [d.year for d in Cost.objects.dates('created_at', 'year', order='DESC')]
+
+    available_years = sorted(set(order_years + cost_years), reverse=True)
+
+    # =====================
+    # ORDERS (kiválasztott év)
+    # =====================
+    orders = Order.objects.filter(created_at__year=selected_year)
+
+    total_cost = sum(
+        o.all_cost for o in orders
+        if o.all_cost is not None
+    )
+
+    # =====================
+    # COSTS (kiválasztott év)
+    # =====================
+    costs = Cost.objects.filter(created_at__year=selected_year).order_by('-created_at')
+    cost_value = sum(c.cost for c in costs)
+
+    # =====================
+    # COST TYPE ÖSSZESÍTÉS
+    # =====================
     cost_data = defaultdict(int)
-    for cost in costs:
-        if cost.type:
-            cost_data[cost.type.name] += cost.cost
+    for c in costs:
+        if c.type:
+            cost_data[c.type.name] += c.cost
 
     labels = list(cost_data.keys())
     values = list(cost_data.values())
 
-    # Hónapok listája
+    # =====================
+    # HÓNAPOK
+    # =====================
     month_names = [
         "Január", "Február", "Március", "Április", "Május", "Június",
         "Július", "Augusztus", "Szeptember", "Október", "November", "December"
     ]
 
-    # Hónapokra és CostType-ra bontott adatok
-    monthly_costs_by_type = defaultdict(lambda: {month: 0 for month in month_names})
+    # =====================
+    # HAVI COSTOK TÍPUSONKÉNT
+    # =====================
+    monthly_costs_by_type = defaultdict(lambda: {m: 0 for m in month_names})
 
     cost_by_month_and_type = (
         Cost.objects
+        .filter(created_at__year=selected_year)
         .values('created_at__month', 'type__name')
         .annotate(total=Sum('cost'))
     )
 
     for entry in cost_by_month_and_type:
-        month_index = entry['created_at__month'] - 1
+        month = month_names[entry['created_at__month'] - 1]
         cost_type = entry['type__name'] or "Nincs kategória"
-        monthly_costs_by_type[cost_type][month_names[month_index]] = entry['total']
+        monthly_costs_by_type[cost_type][month] = entry['total']
 
-    # Színek generálása minden CostType-hoz
-    def generate_color():
-        return f'rgba({random.randint(50, 200)}, {random.randint(50, 200)}, {random.randint(50, 200)}, 0.7)'
+    def gen_color():
+        return f'rgba({random.randint(50,200)}, {random.randint(50,200)}, {random.randint(50,200)}, 0.7)'
 
-    color_map = {cost_type: generate_color() for cost_type in monthly_costs_by_type.keys()}
+    color_map = {ct: gen_color() for ct in monthly_costs_by_type}
 
-    # Hónapokra bontott Chart.js adatok előkészítése
-    monthly_labels = month_names
     monthly_datasets = []
-    for cost_type, month_values in monthly_costs_by_type.items():
-        color = color_map[cost_type]  # Egyedi szín hozzárendelése
+    for ct, months in monthly_costs_by_type.items():
+        color = color_map[ct]
         monthly_datasets.append({
-            'label': cost_type,
-            'data': list(month_values.values()),
+            'label': ct,
+            'data': list(months.values()),
             'backgroundColor': color,
-            'borderColor': color.replace('0.7', '1'),  # Telítettebb szín a borderhez
+            'borderColor': color.replace('0.7', '1'),
             'borderWidth': 1
         })
 
+    # =====================
+    # PROFIT
+    # =====================
     total_profit = total_cost - cost_value
 
-    orders = Order.objects.all()
+    # =====================
+    # HAVI BEVÉTEL
+    # =====================
+    monthly_revenue = defaultdict(int)
+    for o in orders:
+        if o.all_cost:
+            monthly_revenue[o.created_at.month] += o.all_cost
 
-    # Kiszámoljuk a havi bevételeket
-    monthly_revenue_data = defaultdict(int)  # Hónapok és bevételek összegzése
+    chart_labels = [month_names[m-1] for m in sorted(monthly_revenue)]
+    chart_data = [monthly_revenue[m] for m in sorted(monthly_revenue)]
 
-    for order in orders:
-        if order.all_cost is not None:
-            month = order.created_at.strftime('%Y-%m')  # Hónap formátuma YYYY-MM
-            monthly_revenue_data[month] += order.all_cost  # Hozzáadjuk a bevételt az adott hónaphoz
+    # =====================
+    # RENDELÉSSZÁM HAVONTA
+    # =====================
+    orders_by_month = (
+        Order.objects
+        .filter(created_at__year=selected_year)
+        .values('created_at__month')
+        .annotate(total=Count('id'))
+    )
 
-    # Hónapok listájának generálása (sorrendbe téve)
-    months = sorted(monthly_revenue_data.keys())
-
-    # Bevételek kiírása hónapok szerint
-    monthly_revenue_list = [
-        {'month': month, 'revenue': monthly_revenue_data[month]}
-        for month in months
-    ]
-
-    # Az adatokat Chart.js-hez is előkészítjük
-    chart_labels = months  # Hónapok listája
-    chart_data = [monthly_revenue_data[month] for month in months]  # Bevételek adatainak listája
-
-     # Hónapokra bontott rendelések számolása
-    orders_by_month = Order.objects.values('created_at__month').annotate(total=Count('id'))
-
-    # Adatok előkészítése a Chart.js-hez
     orders_data = defaultdict(int)
-    for entry in orders_by_month:
-        month_index = entry['created_at__month'] - 1  # 0-alapú indexeléshez
-        orders_data[month_names[month_index]] = entry['total']
+    for e in orders_by_month:
+        orders_data[month_names[e['created_at__month'] - 1]] = e['total']
 
-    orders_labels = list(orders_data.keys())  # Hónapok nevei
-    orders_values = list(orders_data.values())  # Megrendelések száma
+    orders_labels = list(orders_data.keys())
+    orders_values = list(orders_data.values())
 
-    title = 'Pénzügyi adatok'
+    # =====================
+    # NAPI – UTOLSÓ 7 NAP
+    # =====================
+    today = timezone.now().date()
+    seven_days_ago = today - timedelta(days=6)
 
-    today_daily = timezone.now().date()  # Csak a dátum kell
-    seven_days_ago_daily = today_daily - timedelta(days=6)  # Az utolsó 7 napot nézzük
+    orders_daily = Order.objects.filter(
+        created_at__date__gte=seven_days_ago,
+        created_at__date__lte=today
+    )
 
-    # Lekérdezzük az összes rendelést az elmúlt 7 napból
-    orders_daily = Order.objects.filter(created_at__date__gte=seven_days_ago_daily, created_at__date__lte=today_daily)
+    daily_revenue = {(seven_days_ago + timedelta(days=i)).strftime("%Y-%m-%d"): 0 for i in range(7)}
+    daily_orders = daily_revenue.copy()
 
-    # Üres szótár a napi bevételekhez
-    daily_revenue_daily = { (seven_days_ago_daily + timedelta(days=i)).strftime("%Y-%m-%d"): 0 for i in range(7) }
+    for o in orders_daily:
+        day = o.created_at.strftime("%Y-%m-%d")
+        if o.all_cost:
+            daily_revenue[day] += o.all_cost
+        daily_orders[day] += 1
 
-    # Rendelések összegzése napokra bontva
-    for order_daily in orders_daily:
-        day_daily = order_daily.created_at.date().strftime("%Y-%m-%d")  # Csak a dátum kell
-        daily_revenue_daily[day_daily] += order_daily.all_cost if order_daily.all_cost is not None else 0
+    costs_selected_year = Cost.objects.filter(created_at__year=selected_year)
+    total_cost_selected_year = costs_selected_year.aggregate(total=Sum('cost'))['total'] or 0
 
-    # Kulcsokat és értékeket listába tesszük
-    days_daily = list(daily_revenue_daily.keys())  # Dátumok
-    revenues_daily = list(daily_revenue_daily.values())  # Bevételek
+    # Összes költség minden évből
+    total_cost_all_years = Cost.objects.aggregate(total=Sum('cost'))['total'] or 0
 
-    daily_orders_count = {}  # ÚJ: Naponta hány rendelés történt
+    total_revenue_all_years = (
+    Order.objects
+    .filter(all_cost__isnull=False, )
+    .aggregate(total=Sum('all_cost'))['total'] or 0
+    )
 
-    for order_daily in orders_daily:
-        day_daily = order_daily.created_at.strftime("%Y-%m-%d")
+    total_profit_all_years = total_revenue_all_years - total_cost_all_years
+
     
-    # Rendelésszám
-        if day_daily not in daily_orders_count:
-            daily_orders_count[day_daily] = 0
-        daily_orders_count[day_daily] += 1  # Egy rendelés történt ezen a napon
 
-# Új adat a frontendhez
-    orders_count_daily_count = [daily_orders_count.get(day, 0) for day in days_daily]
+    koltseg = (
+    Product.objects
+    .filter(available=False)
+    .aggregate(total=Sum('cost'))['total'] or 0
+    )
+    koltseg_eves = (
+        Product.objects
+        .filter(available=False)
+        .filter(created_at__year=selected_year)
+        .aggregate(total=Sum('cost'))['total'] or 0
+    )
+    megteremtett_ertek_ossz_eves = (
+        Product.objects
+        .filter(created_at__year=selected_year)
+        .aggregate(total=Sum('price'))['total'] or 0
+    )
+    megteremtett_ertek_ossz_ever = (
+        Product.objects
 
-    income_item = Order.objects.filter(status="Kiszállítva").order_by('-created_at')
-
+        .aggregate(total=Sum('price'))['total'] or 0
+    )
+    meglevo_ertek = (
+        Product.objects
+        .filter(available=True)
+        .aggregate(total=Sum('price'))['total'] or 0
+    )
+    ever_megt_ert = megteremtett_ertek_ossz_ever - total_cost_all_years
+    eves_megt_ert = megteremtett_ertek_ossz_eves - total_cost_selected_year
+    profit_eves = total_cost - koltseg_eves
+    profit_ever = total_revenue_all_years - koltseg
+    raktar_ertek = total_cost_all_years - koltseg
 
     context = {
-        'costs': costs,
-        'cost_value': cost_value,
+        'total_profit_all_years': total_profit_all_years,
+        'total_revenue_all_years': total_revenue_all_years,
+        'total_cost_selected_year': total_cost_selected_year,
+        'total_cost_all_years': total_cost_all_years,
+        'available_years': available_years,
+        'selected_year': selected_year,
+
         'labels': labels,
         'values': values,
-        'monthly_labels': monthly_labels,
+        'monthly_labels': month_names,
         'monthly_datasets': monthly_datasets,
+
         'total_cost': total_cost,
         'total_profit': total_profit,
-        
-        'monthly_revenue_list': monthly_revenue_list,
+
         'chart_labels': chart_labels,
         'chart_data': chart_data,
+
         'orders_labels': orders_labels,
         'orders_values': orders_values,
 
-        'title': title,
-
-        'chart_labels_daily': mark_safe(json.dumps(days_daily)),  # JSON biztosítása
-        'chart_data_daily': mark_safe(json.dumps(revenues_daily)),  # JSON biztosítása
-        'today': today_daily,  # A dátum megfelelő formázásban
-        'chart_orders_daily_count': orders_count_daily_count,
-        'income_item': income_item,
+        'chart_labels_daily': mark_safe(json.dumps(list(daily_revenue.keys()))),
+        'chart_data_daily': mark_safe(json.dumps(list(daily_revenue.values()))),
+        'chart_orders_daily_count': list(daily_orders.values()),
+        'income_item': orders,
+        'costs': costs,
+        'koltseg': koltseg,
+        'koltseg_eves': koltseg_eves,
+        'megteremtett_ertek_ossz_eves': megteremtett_ertek_ossz_eves,
+        'megteremtett_ertek_ossz_ever': megteremtett_ertek_ossz_ever,
+        'meglevo_ertek': meglevo_ertek,
+        'ever_megt_ert': ever_megt_ert,
+        'eves_megt_ert': eves_megt_ert,
+        'profit_eves': profit_eves,
+        'profit_ever': profit_ever,
+        'raktar_ertek': raktar_ertek,
     }
 
     return render(request, 'bus/home.html', context)

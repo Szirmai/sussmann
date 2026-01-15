@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load number_filters  %}
 	{% block content %}
 
 	<!-- search area -->
@@ -22,22 +23,26 @@
 	<!-- end search arewa -->
 	
 	<!-- breadcrumb-section -->
-	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/hatter.webp');">
+	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/gg.jpg');">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="breadcrumb-text">
-						<p>...</p>
-						<h1>Termékek:</h1>
+						<p></p>
+						<h1>Termékek</h1>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- end breadcrumb section -->
-
+	 <a style="padding-left: 40px; padding-top: 20px; color: red" href="{% url 'shop' %}">All</a>
+{% for category in categories %}
+		<a style="padding-left: 40px; padding-top: 20px; color: red" href="{% url 'cat_page' category.name %}">{{category.name}}</a>
+		{% endfor %}
 	<!-- products -->
 	<div class="product-section mt-150 mb-150">
+		
 		<div class="container">
 
 
@@ -54,7 +59,7 @@
                 			{% endif %}
 						</div>
 						<h3>{{product.name}}</h3>
-						<p class="product-price"><span></span> {{product.price }} Ft</p>
+						<p class="product-price"><span></span> {{product.price|intspace }} Ft</p>
 						{% if product.available %}
                 <a href="{% url 'cart_add' product.id %}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Kosárba</a>
             {% else %}

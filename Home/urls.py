@@ -6,6 +6,7 @@ urlpatterns = [
     path('about/', views.About, name='about'),
     path('product/<int:product_id>/', views.ProductSingle, name='product_single'),
     path('bolt/', views.Shop, name='shop'),
+    
     path('bolt/<str:name>/', views.CatPage, name='cat_page'),
     path('contact/', views.Contact, name='contact'),
     path('success/', views.Success, name='success'),

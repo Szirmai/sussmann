@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'Home',
     'shop',
     'dashboard',
-    'statistic_',
+    'analytics.apps.AnalyticsConfig',
     'bussiness',
 ]
 
@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'analytics.middleware.PageViewMiddleware',
 ]
 
 ROOT_URLCONF = 'DemoProject.urls'
@@ -152,3 +153,10 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = "noreply@sussmann.hu"
 EMAIL_HOST_PASSWORD = "NoReply01234"
 DEFAULT_FROM_EMAIL = "noreply@sussmann.hu"
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'analytics-cache',
+    }
+}

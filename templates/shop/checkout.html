@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load number_filters  %}
 	{% block content %}
 
 	<!-- search area -->
@@ -23,12 +23,12 @@
 	<!-- end search arewa -->
 	
 	<!-- breadcrumb-section -->
-	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/hatter.webp');">
+	<div class="breadcrumb-section breadcrumb-bg" style="background-image: url('/media/products/gg.jpg');">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="breadcrumb-text">
-						<p>...</p>
+						<p></p>
 						<h1>Megrendelés</h1>
 					</div>
 				</div>
@@ -137,7 +137,7 @@
 								
 								{% for item in cart_items %}<tr>
 									<td>{{item.name}}</td>
-									<td>{{item.total_price}} Ft</td>
+									<td>{{item.total_price|intspace}} Ft</td>
 								</tr>
 								{% endfor %}
 							</tbody>
@@ -150,20 +150,20 @@
 							</thead>
 								<tr>
 									<td>Termékek ára</td>
-									<td>{{bruttó_price}} Ft</td>
+									<td>{{bruttó_price|intspace}} Ft</td>
 								</tr>
 								<tr>
 									<td>Szállítás</td>
-									<td>{{shipping_cost}} Ft</td>
+									<td>{{shipping_cost|intspace}} Ft</td>
 								</tr>
 								<tr>
 									<td>Összesen</td>
-									<td>{{összesen_price}} Ft</td>
+									<td>{{összesen_price|intspace}} Ft</td>
 								</tr>
 							</tbody>
 						</table>
 						<a class="boxed-btn" type="button" id="submit-all">Megrendelés</a>
-						<a><p style="color: red;">Ha nem működik ez a gomb, győződj meg arról, hogy a *-gal jelölt mezők ki vannak töltve.</p>	</a>
+						<a><p style="color: red;">Ha nem működik ez a gomb, győződjön meg arról, hogy a *-gal jelölt mezők ki vannak töltve.</p>	</a>
 					</div>
 				</div>
 			</div>

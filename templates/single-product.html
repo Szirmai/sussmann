@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load number_filters  %}
 	{% block content %}
 
 	<!-- search area -->
@@ -59,12 +60,12 @@
         </div>
 
 <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
-    <i class="fas fa-chevron-left fa-2x" style="color:white;"></i>
+    <i class="fas fa-chevron-left fa-2x" style="color:black;"></i>
     <span class="sr-only">Previous</span>
 </a>
 
 <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
-    <i class="fas fa-chevron-right fa-2x" style="color:white;"></i>
+    <i class="fas fa-chevron-right fa-2x" style="color:black;"></i>
     <span class="sr-only">Next</span>
 </a>
 
@@ -108,7 +109,7 @@
 				<div class="col-md-7">
 					<div class="single-product-content">
 						<h3>{{product.name}}</h3>
-						<p class="single-product-pricing"><span></span> {{product.price}} Ft</p>
+						<p class="single-product-pricing"><span></span> {{product.price|intspace}} Ft</p>
 													{% if product.available %}
                 <a href="{% url 'cart_add' product.id %}" class="cart-btn"><i class="fas fa-shopping-cart"></i> Kosárba</a>
             {% else %}

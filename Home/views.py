@@ -14,12 +14,13 @@ from . import models
 
 
 def home_view(request):
-    products = Product.objects.all().order_by('-created_at')[0:3]
+    products = Product.objects.filter(visibility=True).order_by('-created_at')[0:3]
     deals = DealOfMonth.objects.filter(exp_date__gte = date.today()).order_by('-created_at')[:1]
     youtubes = YouTube.objects.all().order_by('-created_at')[0:1]
     quotes = Quotes.objects.all().order_by('-created_at')
     news = models.New.objects.all().order_by('-date')[0:3]
     title = 'Home'
+    
 
     context = {'products': products,
                'deals': deals,
@@ -27,6 +28,7 @@ def home_view(request):
                'quotes': quotes,
                'title': title,
                'news': news,
+
                }
     return render(request, 'index.html', context)
 
@@ -46,7 +48,7 @@ def About(request):
 
 def ProductSingle(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    similar_products = Product.objects.filter(categories=product.categories).exclude(id=product_id)[0:3] 
+    similar_products = Product.objects.filter(categories=product.categories, visibility=True).exclude(id=product_id)[0:3] 
     context = {'product': product,
                'similar_products': similar_products,
                }
@@ -54,7 +56,7 @@ def ProductSingle(request, product_id):
 
 
 def Shop(request):
-    product = Product.objects.all().order_by('-created_at')
+    product = Product.objects.filter(visibility=True).order_by('-created_at')
     categories = Category.objects.all()
     print(product)
     title = 'Bolt'
@@ -66,10 +68,12 @@ def Shop(request):
 
 
 def CatPage(request, name):
-    products = Product.objects.filter(categories__name=name)
+    products = Product.objects.filter(categories__name=name, visibility=True)
     title = name
+    categories = Category.objects.all()
     context = {'products': products,
                'title': title,
+               'categories': categories,
                }
     
     return render(request, 'shop.html', context)

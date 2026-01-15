@@ -163,6 +163,7 @@ def new_dash(request):
     }
     return render(request, 'dash/new_dash.html', context)
 
+@user_passes_test(is_admin, login_url='/')
 def edit_new(request, pk):
     new = get_object_or_404(New, id=pk)  # get_object_or_404, hogy egyetlen példányt kapjunk
 
@@ -178,6 +179,8 @@ def edit_new(request, pk):
     context = {'new': new,
                'form': form}
     return render(request, 'dash/edit_new.html', context)
+
+@user_passes_test(is_admin, login_url='/')
 
 def add_new(request):
 

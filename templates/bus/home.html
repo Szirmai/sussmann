@@ -1,38 +1,155 @@
 
 {% extends 'dash/base.html' %}
 {% load static %}
+{% load number_filters  %}
 	{% block content %}
 	
-	<div class="row">
+<div class="row">
 		<div class="card-01">
 			<a href=""><div class="card-1-layout">
 					<div class="info-1-left">
-						<h3>Összes költség</h3>
-						<h1>{{cost_value}} Ft</h1>
+						<h3>Ever összes kiadás</h3>
+						<h1>{{total_cost_all_years|intspace}} Ft</h1>
 					</div>
-					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">list_alt</span></div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">display_external_input</span></div>
 			</div></a>
 		</div>
-		<div class="card-01">
+    
+    <div class="card-01">
 			<a href=""><div class="card-1-layout">
 					<div class="info-1-left">
-						<h3>Összes bevétel</h3>
-						<h1>{{total_cost}} Ft</h1>
+						<h3>Ever összes bevétel</h3>
+						<h1>{{total_revenue_all_years|intspace}} Ft</h1>
 					</div>
 					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">shopping_cart_checkout</span></div>
 			</div></a>
 		</div>
-		<div class="card-01">
+    <!---->
+        <div class="card-01">
 			<a href=""><div class="card-1-layout">
 					<div class="info-1-left">
-						<h3>~Profit (Költség-Bevétel)</h3>
-						<h1>{{total_profit}} Ft</h1>
+						<h3>Költségek (ever):</h3>
+						<h1>{{koltseg|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">credit_card_off</span></div>
+			</div></a>
+		</div>
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Ever Megteremtett érték:</h3>
+						<h1>{{megteremtett_ertek_ossz_ever|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Profit Ever</h3>
+						<h1>{{profit_ever|intspace}} Ft</h1>
 					</div>
 					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
 			</div></a>
 		</div>
+</div>
+
+
+<h2>Pénzügyi adatok – {{ selected_year }}</h2>
+
+<form method="get" style="margin-bottom: 20px;">
+    <label for="year">Év:</label>
+    <select name="year" id="year" onchange="this.form.submit()">
+        {% for year in available_years %}
+            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
+                {{ year }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+
+  <div class="row">
+
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Raktár érték:</h3>
+						<h1>{{raktar_ertek|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">warehouse</span></div>
+			</div></a>
+		</div>
+            <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Profit – {{ selected_year }}</h3>
+						<h1>{{profit_eves|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
+			</div></a>
+		</div>
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Bevétel – {{ selected_year }}</h3>
+						<h1>{{total_cost|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">shopping_cart_checkout</span></div>
+			</div></a>
+		</div>
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Összes kiadás – {{ selected_year }}</h3>
+						<h1>{{total_cost_selected_year|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">display_external_input</span></div>
+			</div></a>
+		</div>
+		
+		<!---->
+
 		
 	</div>
+  <div class="row">
+    
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Megteremtett érték – {{ selected_year }}</h3>
+						<h1>{{megteremtett_ertek_ossz_eves|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>    
+
+
+
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Költségek – {{ selected_year }}</h3>
+						<h1>{{koltseg_eves|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">credit_card_off</span></div>
+			</div></a>
+		</div>
+
+            <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Meglévő érték</h3>
+						<h1>{{meglevo_ertek|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+
+
+  </div>
+
+
 	
 	<div class="row">
 		<div class="card-02">
@@ -291,8 +408,8 @@
 
 	<div class="row">
 		<div class="card-03">
-			<h2>Kiadások </h2>
-			<a style="padding: 20px" href="{% url 'add_cost' %}">Költség hozzáadása +</a>
+			<h2>Bevételek </h2>
+			
 			<table id="customers">
 				<thead>
 			  <tr class="pos-r">
@@ -306,7 +423,7 @@
 			  {% for order in income_item %}
 			  <a href=""><tr>				
 				<td>{{order.name}}</td>
-				<td>{{order.brutto_price}}</td>
+				<td>{{order.all_cost|intspace}}</td>
 				<td>{{order.created_at}}</td>
 
 
@@ -346,7 +463,7 @@
 			  {% for cost in costs %}
 			  <a href="{% url 'edit_cost' cost.id %}"><tr>				
 				<td>{{cost.title}}</td>
-				<td>{{cost.cost}}</td>
+				<td>{{cost.cost|intspace}}</td>
 				<td>{{cost.created_at}}</td>
 				<td>{{cost.cause}}</td>
 				<td>{{cost.type.name}}</td>
@@ -373,6 +490,50 @@
 			</table>
 		</div>
 	</div>
+    <h2>Irreleváns Pénzügyi adatok – {{ selected_year }}</h2>
+<div class="row">
+
+
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Ever megt.ért. - ever kiad.:</h3>
+						<h1>{{ever_megt_ert|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
+			</div></a>
+		</div>
+
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Éves megt.ért. - Éves kiad.:</h3>
+						<h1>{{eves_megt_ert|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
+			</div></a>
+		</div>
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Ever (bev-kiad.)</h3>
+						<h1>{{total_profit_all_years|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">shopping_cart_checkout</span></div>
+			</div></a>
+		</div>
+    <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Éves (bev-kiad)</h3>
+						<h1>{{total_profit|intspace}} Ft</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">decimal_decrease</span></div>
+			</div></a>
+		</div>
+
+</div>
+
 
 	
 

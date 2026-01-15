@@ -1,0 +1,525 @@
+
+{% extends 'dash/base.html' %}
+{% load static %}
+{% load number_filters  %}
+	{% block content %}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+<h2>Unique hits on different pages</h2>
+
+
+  <div class="row">
+
+         <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Ma</h3>
+						<h1>{{daily_visits|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">credit_card_off</span></div>
+			</div></a>
+		</div>
+
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Elmúlt 7 nap</h3>
+						<h1>{{weekly_visits|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+                <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Elmúlt hónap</h3>
+						<h1>{{monthly_visits|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+
+		
+		<!---->
+
+		
+	</div>
+
+<h2>Unique hits on any pages</h2>
+  <div class="row">
+
+
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Ma</h3>
+						<h1>{{daily_unique_visitors|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">credit_card_off</span></div>
+			</div></a>
+		</div>
+
+        <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Elmúlt 7 nap</h3>
+						<h1>{{weekly_unique_visitors|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+                <div class="card-01">
+			<a href=""><div class="card-1-layout">
+					<div class="info-1-left">
+						<h3>Elmúlt hónap</h3>
+						<h1>{{monthly_unique_visitors|intspace }} db</h1>
+					</div>
+					<div class="info-1-right"><span class="material-symbols-outlined card-1-des pos-ab">brightness_empty</span></div>
+			</div></a>
+		</div>
+
+
+  </div>
+
+  	<div class="row">
+		<div class="card-03">
+			<h2> 7 legnézettebb oldal</h2>
+			
+			<table id="customers">
+				<thead>
+			  <tr class="pos-r">
+				<th>Url</th>
+				<th>Látogatók</th>
+
+
+			  </tr>
+			  </thead>
+			  {% for page in top_pages %}
+			  <a href=""><tr>				
+				<td>{{ page.path }}</td>
+				<td>{{ page.visits|intspace }}</td>
+
+			</tr></a>
+			{% empty %}
+			<tr>
+				<td></td>
+
+				<td>Nincsenek látogatások...</td>
+
+			  </tr>
+			{% endfor %}
+
+			
+  
+			 
+			</table>
+		</div>
+		<div class="card-03">
+			<h2> 7 legnézettebb oldal (elmúlt 7 napban)</h2>
+			
+			<table id="customers">
+				<thead>
+			  <tr class="pos-r">
+				<th>Url</th>
+				<th>Látogatók</th>
+
+
+			  </tr>
+			  </thead>
+			  {% for page in top_pages_last_7_days %}
+			  <a href=""><tr>				
+				<td>{{ page.path }}</td>
+				<td>{{ page.visits|intspace }}</td>
+
+			</tr></a>
+			{% empty %}
+			<tr>
+				<td></td>
+
+				<td>Nincsenek látogatások...</td>
+
+			  </tr>
+			{% endfor %}
+
+			
+  
+			 
+			</table>
+		</div>
+	</div>
+
+<div class="row">
+	<div class="card-02">
+      <h2>Napi egyedi látogatók (elmúlt 7 nap)</h2>
+      <canvas id="dailyVisitorsChart"></canvas>
+	</div>
+	<div class="card-02">
+      <h2>Top 7 oldal az elmúlt 7 napban</h2>
+      <canvas id="topPagesChart"></canvas>
+	</div>
+</div>
+
+<div class="row">
+	<div class="card-02">
+      <h3>Top oldalak (elmúlt 7 nap)</h3>
+	  <canvas id="topPagesDoughnut"></canvas>
+	</div>
+	<div class="card-02">
+      <h3>Összes megtekintés vs egyedi látogatók</h3>
+	  <canvas id="viewsVsUniqueChart"></canvas>
+	</div>
+</div>
+
+<div class="row">
+	<div class="card-02">
+      <h3>Visszatérő látogatók</h3>
+	  <canvas id="monthlyReturningChart"></canvas>
+	</div>
+	<div class="card-02">
+      <h3>Hány %-a tér vissza a látogatóknak?</h3>
+	  <canvas id="returningPercentChart"></canvas>
+	</div>
+</div>
+
+{{ daily_labels|json_script:"daily-labels" }}
+{{ daily_data|json_script:"daily-data" }}
+
+{{ top_page_labels|json_script:"top-page-labels" }}
+{{ top_page_data|json_script:"top-page-data" }}
+
+{{ monthly_labels|json_script:"monthly-labels" }}
+{{ monthly_unique_data|json_script:"monthly-unique" }}
+{{ monthly_returning_data|json_script:"monthly-returning" }}
+<!-- labels -->
+{{ views_labels|json_script:"views-labels" }}
+
+<!-- views -->
+{{ views_data|json_script:"views-data" }}
+
+<!-- egyedi látogatók -->
+{{ views_unique_data|json_script:"unique-data" }}
+
+{{ monthly_labels|json_script:"monthly-labels" }}
+{{ monthly_returning_percent|json_script:"monthly-returning-percent" }}
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const labels = JSON.parse(document.getElementById('monthly-labels').textContent);
+    const dataPercent = JSON.parse(document.getElementById('monthly-returning-percent').textContent);
+
+    new Chart(document.getElementById('returningPercentChart'), {
+        type: 'line', // trendhez legjobb
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Visszatérő látogatók (%)',
+                data: dataPercent,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3,
+                fill: true,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.raw + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { stepSize: 10, callback: value => value + '%' }
+                }
+            }
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const labels = JSON.parse(
+        document.getElementById('monthly-labels').textContent
+    );
+    const uniqueData = JSON.parse(
+        document.getElementById('monthly-unique').textContent
+    );
+    const returningData = JSON.parse(
+        document.getElementById('monthly-returning').textContent
+    );
+
+    new Chart(document.getElementById('monthlyReturningChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Összes egyedi látogató / hónap',
+                    data: uniqueData,
+                    tension: 0.3
+                },
+                {
+                    label: 'Visszatérő látogatók / hónap',
+                    data: returningData,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const labels = JSON.parse(
+        document.getElementById('views-labels').textContent
+    );
+    const viewsData = JSON.parse(
+        document.getElementById('views-data').textContent
+    );
+    const uniqueData = JSON.parse(
+        document.getElementById('unique-data').textContent
+    );
+
+    new Chart(document.getElementById('viewsVsUniqueChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Megtekintések',
+                    data: viewsData,
+                    tension: 0.3
+                },
+                {
+                    label: 'Egyedi látogatók',
+                    data: uniqueData,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const labels = JSON.parse(
+        document.getElementById('top-page-labels').textContent
+    );
+    const data = JSON.parse(
+        document.getElementById('top-page-data').textContent
+    );
+
+    new Chart(document.getElementById('topPagesDoughnut'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.raw;
+                            const percent = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percent}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+<script>
+const dailyLabels = JSON.parse(
+    document.getElementById('daily-labels').textContent
+);
+const dailyData = JSON.parse(
+    document.getElementById('daily-data').textContent
+);
+
+new Chart(document.getElementById('dailyVisitorsChart'), {
+    type: 'line',
+    data: {
+        labels: dailyLabels,
+        datasets: [{
+            label: 'Egyedi látogatók',
+            data: dailyData,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+</script>
+<script>
+const topPageLabels = JSON.parse(
+    document.getElementById('top-page-labels').textContent
+);
+const topPageData = JSON.parse(
+    document.getElementById('top-page-data').textContent
+);
+
+new Chart(document.getElementById('topPagesChart'), {
+    type: 'bar',
+    data: {
+        labels: topPageLabels,
+        datasets: [{
+            label: 'Megtekintések',
+            data: topPageData
+        }]
+    },
+    options: {
+        responsive: true,
+        indexAxis: 'y',
+        scales: {
+            x: {
+                beginAtZero: true
+            },
+			y: {
+            beginAtZero: true,
+            ticks: {
+                stepSize: 1,      // 🔥 EZ A LÉNYEG
+                precision: 0
+            }
+        }
+        }
+    }
+});
+</script>
+
+
+
+
+
+	
+
+
+
+	
+
+
+
+
+
+
+	<script>
+		const dailyData = {{ daily_data|safe }};
+		const dailyLabels = {{ daily_labels|safe }};
+		console.log(dailyLabels);
+console.log(dailyData);
+
+        // 1️⃣ Napi egyedi látogatók
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels
+                datasets: [{
+                    label: 'Napi egyedi látogatók',
+                    data: dailyData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // 2️⃣ Top 7 oldal
+        const topPagesCtx = document.getElementById('topPagesChart').getContext('2d');
+        new Chart(topPagesCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ top_page_labels|safe }},
+                datasets: [{
+                    label: 'Látogatások',
+                    data: {{ top_page_data|safe }},
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+    </script>
+
+
+{% endblock %}

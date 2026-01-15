@@ -4,7 +4,7 @@ from .models import Product, ProductImage, Contact, New, CategoryNew
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'stock', 'image', 'available', 'categories']
+        fields = ['name', 'description', 'price', 'stock', 'image', 'available', 'categories', 'cost', 'visibility']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter product name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows':4, 'placeholder':'Enter product description'}),
@@ -13,6 +13,8 @@ class ProductForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'class':'form-control-file'}),  # itt NEM kell multiple=True
             'available': forms.CheckboxInput(attrs={'class1':'form-check-input'}),
             'categories': forms.Select(attrs={'class':'form-category'}),
+            'cost': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter cost'}),
+            'visiblity': forms.CheckboxInput(attrs={'class1':'form-check-input'}),
         }
 
     def clean_price(self):

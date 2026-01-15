@@ -20,6 +20,8 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', null=True)  # Image field (optional)
     available = models.BooleanField(default=True)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    cost = models.IntegerField(null=True, default=13000)
+    visibility = models.BooleanField(default=True)
     
     def __str__(self):
         return self.name  # String representation of the product (display name in admin)
