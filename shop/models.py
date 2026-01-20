@@ -89,7 +89,7 @@ class Order(models.Model):
     brutto_price = models.IntegerField(null=True)
     shipping_cost = models.ForeignKey(ShippingCost, on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=50, null=True, choices=STATUS_CHOICES, default="Új")
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     tax = models.CharField(max_length=200, null=True)
     coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
     discount_amount = models.IntegerField(default=0)

@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 # Create your models here.
 
 class CostType(models.Model):
@@ -13,7 +13,7 @@ class Cost(models.Model):
     title = models.CharField(max_length=200, null=True)
     cost = models.IntegerField(null=True)
     cause = models.CharField(max_length=400, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     type = models.ForeignKey(CostType, on_delete=models.CASCADE, null=True)
 
     def __str__(self):

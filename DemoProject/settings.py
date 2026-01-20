@@ -160,3 +160,14 @@ CACHES = {
         'LOCATION': 'analytics-cache',
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'sussmannknifewor$sussmann',  # a teljes adatbázis név
+#        'USER': 'sussmannknifewor',           # PA MySQL felhasználó
+#        'PASSWORD': 'MYSQL_PASSWORD',         # amit megadtál
+#        'HOST': 'sussmannknifeworks.mysql.pythonanywhere-services.com',
+#        'PORT': '3306',
+#    }
+#}

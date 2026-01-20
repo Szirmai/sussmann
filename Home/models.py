@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User  # For author
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -15,7 +16,7 @@ class Product(models.Model):
     description = models.TextField()  # A detailed description of the product
     price = models.DecimalField(max_digits=10, decimal_places=0)  # Price with 2 decimal places
     stock = models.PositiveIntegerField()  # The number of items in stock
-    created_at = models.DateTimeField(auto_now_add=True)  # Automatically set when the product is created
+    created_at = models.DateTimeField(default=timezone.now)  # Automatically set when the product is created
     updated_at = models.DateTimeField(auto_now=True)  # Automatically set when the product is updated
     image = models.ImageField(upload_to='products/', null=True)  # Image field (optional)
     available = models.BooleanField(default=True)
