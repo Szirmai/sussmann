@@ -183,4 +183,9 @@ def new(request, pk):
     return render(request, 'single-news.html', context)
 
 def policy(request):
-    return redirect('home')
+    title = 'Adatvédelmi tájékoztató'
+    context = {
+        'title':  title,
+        
+    }
+    return render(request, 'policy.html', context)
