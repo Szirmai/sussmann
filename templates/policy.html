@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+	{% block content %}
+
+	<!-- search area -->
+	<div class="search-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="close-btn"><i class="fas fa-window-close"></i></span>
+					<div class="search-bar">
+						<div class="search-bar-tablecell">
+							<h3>Search For:</h3>
+							<input type="text" placeholder="Keywords">
+							<button type="submit">Search <i class="fas fa-search"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end search arewa -->
+	
+	<!-- breadcrumb-section -->
+	<div class="breadcrumb-section breadcrumb-bg"  style="background-image: url('/media/products/gg.jpg');">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="breadcrumb-text">
+						<p></p>
+						<h1>Adatvédelem</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end breadcrumb section -->
+
+	<!-- contact form -->
+	
+<section style="max-width: 900px; margin: 0 auto; padding: 24px; font-family: Arial, Helvetica, sans-serif; line-height: 1.6;">
+  <header style="margin-bottom: 18px;">
+    <h1 style="margin: 0 0 8px 0; font-size: 28px;">Adatvédelmi tájékoztató</h1>
+    <p style="margin: 0; color: #555;">
+      Utolsó frissítés: <strong>[2026-02-05]</strong>
+    </p>
+  </header>
+
+  <hr style="border: 0; border-top: 1px solid #ddd; margin: 18px 0;" />
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">1. Az adatkezelő</h2>
+  <p style="margin: 0 0 10px;">
+    A weboldalt <strong>magánszemély</strong> üzemelteti.
+  </p>
+  <p style="margin: 0 0 10px;">
+    Kapcsolattartás: <strong>info@sussmann.hu</strong><br />
+    <span style="color:#555;">...</span>
+  </p>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">2. Az adatkezelés célja</h2>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>a weboldal használatának elemzése,</li>
+    <li>a megrendelések kezelése és teljesítése,</li>
+    <li>kapcsolattartás az érdeklődőkkel és megrendelőkkel.</li>
+  </ul>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">3. A kezelt adatok köre</h2>
+
+  <h3 style="font-size: 16px; margin: 10px 0 6px;">3.1. Weboldal látogatása</h3>
+  <p style="margin: 0 0 10px;">
+    A weboldal látogatása során automatikusan gyűjtött adatok:
+  </p>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>IP-cím (titkosított / anonimizált formában),</li>
+    <li>látogatás időpontja,</li>
+    <li>meglátogatott oldalak,</li>
+    <li>böngésző technikai adatai.</li>
+  </ul>
+  <p style="margin: 0 0 10px;">
+    Ezek az adatok kizárólag statisztikai célokat szolgálnak, és nem alkalmasak személyazonosításra.
+  </p>
+
+  <h3 style="font-size: 16px; margin: 10px 0 6px;">3.2. Google Analytics</h3>
+  <p style="margin: 0 0 10px;">
+    A weboldal a <strong>Google Analytics</strong> szolgáltatást használ a látogatottság elemzésére.
+    Az IP-címek anonimizálásra kerülnek, így azok nem köthetők konkrét személyhez.
+  </p>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">4. Megrendelés során kezelt adatok</h2>
+  <p style="margin: 0 0 10px;">
+    Megrendelés vagy kapcsolatfelvétel esetén az alábbi adatokat kezeljük:
+  </p>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>név,</li>
+    <li>e-mail cím,</li>
+    <li>telefonszám,</li>
+    <li>szállítási cím,</li>
+    <li>számlázási adatok</li>
+  </ul>
+  <p style="margin: 0 0 10px;">
+    Az adatok kizárólag a megrendelés lebonyolításához és a kapcsolattartáshoz szükségesek.
+  </p>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">5. Az adatkezelés jogalapja</h2>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>az érintett önkéntes hozzájárulása,</li>
+    <li>a felek közötti megállapodás teljesítése.</li>
+  </ul>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">6. Az adatok megőrzése</h2>
+  <p style="margin: 0 0 10px;">
+    A személyes adatokat csak a szükséges ideig őrizzük meg:
+  </p>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>analitikai adatok: statisztikai célok eléréséig,</li>
+    <li>megrendelési adatok: a kapcsolat fennállásáig vagy törlési kérelemig.</li>
+  </ul>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">7. Adattovábbítás</h2>
+  <p style="margin: 0 0 10px;">
+    A kezelt adatokat harmadik félnek nem adjuk át, kivéve technikai szolgáltatók (pl. tárhelyszolgáltató)
+    esetén, kizárólag a működéshez szükséges mértékben.
+  </p>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">8. Érintetti jogok</h2>
+  <p style="margin: 0 0 10px;">Az érintettek jogosultak:</p>
+  <ul style="margin: 0 0 10px 18px;">
+    <li>tájékoztatást kérni a kezelt adatokról,</li>
+    <li>kérni adataik módosítását vagy törlését,</li>
+    <li>hozzájárulásukat bármikor visszavonni.</li>
+  </ul>
+
+  <h2 style="font-size: 20px; margin: 18px 0 8px;">9. Kapcsolat</h2>
+  <p style="margin: 0 0 10px;">
+    Adatkezeléssel kapcsolatos kérdés esetén a fenti e-mail címen lehet kapcsolatba lépni.
+  </p>
+
+  <hr style="border: 0; border-top: 1px solid #ddd; margin: 18px 0;" />
+
+  <p style="margin: 0; color: #666; font-size: 12px;">
+    ...
+  </p>
+</section>
+
+
+	<!-- end contact form -->
+
+	<!-- find our location -->
+	<div class="find-location blue-bg">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 text-center">
+					<p> <i class="fas fa-map-marker-alt"></i> Helyszín</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end find our location -->
+
+	<!-- google map section -->
+	<div class="embed-responsive embed-responsive-21by9">
+		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d85698.49380495424!2d18.8977398360383!3d47.838083583341465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476a813da12ade33%3A0x9a9c855f185eac8f!2zVmVyxZFjZSwgMjYyMQ!5e0!3m2!1sen!2shu!4v1761470080818!5m2!1sen!2shu" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" class="embed-responsive-item"></iframe>
+	</div>
+	<!-- end google map section -->
+
+
+	{% endblock %}

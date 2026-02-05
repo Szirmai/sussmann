@@ -9,6 +9,9 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from dotenv import load_dotenv
+load_dotenv()
+
 
 from pathlib import Path
 import os
@@ -28,7 +31,13 @@ SECRET_KEY = 'django-insecure-d-f$$@1t$f7ev)$bg=%$=u4&z12q-a4i%ke$=#lb!db#l56yr^
 DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sussmann.hu', 'www.sussmann.hu', '127.0.0.1']
+
+
+GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
+
+
+
 
 
 # Application definition
@@ -75,6 +84,11 @@ TEMPLATES = [
         },
     },
 ]
+
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    "Home.context_processors.analytics",
+]
+
 
 WSGI_APPLICATION = 'DemoProject.wsgi.application'
 
@@ -161,13 +175,13 @@ CACHES = {
     }
 }
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'sussmannknifewor$sussmann',  # a teljes adatbázis név
-#        'USER': 'sussmannknifewor',           # PA MySQL felhasználó
-#        'PASSWORD': 'MYSQL_PASSWORD',         # amit megadtál
-#        'HOST': 'sussmannknifeworks.mysql.pythonanywhere-services.com',
-#        'PORT': '3306',
-#    }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sussmannknifewor$sussmann',  # a teljes adatbázis név
+        'USER': 'sussmannknifewor',           # PA MySQL felhasználó
+        'PASSWORD': 'Knifeworks01234',         # amit megadtál
+        'HOST': 'sussmannknifeworks.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
+    }
+}

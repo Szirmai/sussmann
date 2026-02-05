@@ -37,6 +37,18 @@
 	<!-- responsive -->
 	<link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
 
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        gtag('consent', 'default', {
+            analytics_storage: 'denied',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied'
+        });
+    </script>
+
 </head>
 <body>
 	
@@ -145,6 +157,89 @@
 <script src="{% static 'assets/js/sticker.js' %}"></script>
 <!-- main js -->
 <script src="{% static 'assets/js/main.js' %}"></script>
+
+
+
+	<div id="cookie-banner" style="position:fixed;left:16px;right:16px;bottom:16px;padding:16px;background:#111;color:#fff;border-radius:12px;display:none;z-index:9999;">
+  <div style="max-width:900px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+    <div>
+      Ez az oldal analitikai sütiket használ a látogatottság mérésére. 
+      <a href="{% url 'policy' %}" style="color:#9ae6ff;text-decoration:underline;">Részletek</a>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="cookie-reject" style="padding:10px 12px;border-radius:10px;border:1px solid #666;background:transparent;color:#fff;cursor:pointer;">
+        Elutasítom
+      </button>
+      <button id="cookie-accept" style="padding:10px 12px;border-radius:10px;border:0;background:#fff;color:#111;border-radius:10px;cursor:pointer;">
+        Elfogadom
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const banner = document.getElementById('cookie-banner');
+    const accept = document.getElementById('cookie-accept');
+    const reject = document.getElementById('cookie-reject');
+
+    if (!banner || !accept || !reject) return;
+
+    const GA_ID = "{{ GA_MEASUREMENT_ID|default:'' }}";
+
+    function loadGA() {
+      if (!GA_ID) return; // ha nincs beállítva, ne próbálkozzunk
+      if (window.__ga_loaded) return; // ne töltsük be kétszer
+      window.__ga_loaded = true;
+
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+      document.head.appendChild(s);
+
+      gtag('js', new Date());
+      gtag('config', GA_ID);
+    }
+
+    // Banner megjelenítés, ha még nincs döntés
+    const stored = localStorage.getItem('cookie_consent_v1');
+    if (!stored) {
+      banner.style.display = 'block';
+    } else if (stored === 'accepted') {
+      // ha korábban elfogadta, induljon GA automatikusan
+      gtag('consent', 'update', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+      loadGA();
+    }
+
+    accept.addEventListener('click', function() {
+      localStorage.setItem('cookie_consent_v1', 'accepted');
+      gtag('consent', 'update', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+      loadGA();
+      banner.style.display = 'none';
+    });
+
+    reject.addEventListener('click', function() {
+      localStorage.setItem('cookie_consent_v1', 'rejected');
+      gtag('consent', 'update', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+      banner.style.display = 'none';
+    });
+  })();
+</script>
 
 </body>
 </html>
