@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import modelformset_factory
 from .models import Product, ProductImage, Contact, New, CategoryNew
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -14,7 +17,7 @@ class ProductForm(forms.ModelForm):
             'available': forms.CheckboxInput(attrs={'class1':'form-check-input'}),
             'categories': forms.Select(attrs={'class':'form-category'}),
             'cost': forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter cost'}),
-            'visiblity': forms.CheckboxInput(attrs={'class1':'form-check-input'}),
+            'visibility': forms.CheckboxInput(attrs={'class':'form-check-input'}),
         }
 
     def clean_price(self):
@@ -45,6 +48,7 @@ class ProductImageForm(forms.ModelForm):
         }
 
 class ContactForm(forms.ModelForm):
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
     class Meta:
         model = Contact
         fields = ['name', 'email', 'subject', 'message']
@@ -53,6 +57,7 @@ class ContactForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'id': 'email'}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the subject', 'id': 'subject'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'cols': 40, 'placeholder': 'Enter your message', 'id': 'message'}),
+            
         }
 
     def clean_email(self):
@@ -108,3 +113,8 @@ class NewCategoryForm(forms.ModelForm):
     class Meta:
         model = CategoryNew
         fields = ['name']
+
+
+class SubscribeForm(forms.Form):
+    email = forms.EmailField()
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)

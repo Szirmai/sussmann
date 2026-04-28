@@ -37,11 +37,15 @@
 				</div>
 				<div class="col-lg-3 col-md-6">
 					<div class="footer-box subscribe">
-						<h2 class="widget-title">Feliratkozás</h2>
-						<p>Néha kaphatsz emailt különleges termékeimről...</p>
+						<h2 class="widget-title">Értesítést kérek</h2>
+						<p>Csak a szériák megjelenésekor írunk. Nem küldünk rendszeres hírlevelet.</p>
 						<form action="{% url 'subsc' %}" method="POST">
 							{% csrf_token %}
-							<input type="email" name="email" placeholder="* Email..." required>
+
+
+
+    {{ subscribe_form.email }}
+    {{ subscribe_form.captcha }}
 							<button type="submit"><i class="fas fa-paper-plane"></i></button>
 						</form>
 					</div>

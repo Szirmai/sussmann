@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from datetime import datetime
 from django.core.mail import send_mail
 from . import models
+from .forms import SubscribeForm
 
 
 def home_view(request):
@@ -48,8 +49,10 @@ def About(request):
 
 def ProductSingle(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    title = product.name
     similar_products = Product.objects.filter(categories=product.categories, visibility=True).exclude(id=product_id)[0:3] 
     context = {'product': product,
+               'title': title,
                'similar_products': similar_products,
                }
     return render(request, 'single-product.html', context)
@@ -125,35 +128,42 @@ def Success(request):
 
 def subscribe_view(request):
     if request.method == 'POST':
-        subsc = request.POST.get("email", "").strip()
+        form = SubscribeForm(request.POST)
 
-        Subsc.objects.create(
-            email=subsc
-        )
-        messages.success(request, 'A feliratkozás megtörtént!')
-        html = render_to_string("subsciption_email.html", {
-            "title": "Feliratkozás megerősítve!",
-               "subscriber_email": subsc,
-               "year": datetime.now().year,
-         })
+        if form.is_valid():
+            subsc = form.cleaned_data["email"]
 
-        msg = EmailMultiAlternatives(
-             subject="Köszönjük, hogy feliratkoztál!",
-             body="A leveled HTML-t tartalmaz.",
-             from_email="noreply@sussmann.hu",
-             to=[subsc],
-         )
-        msg.attach_alternative(html, "text/html")
-        msg.send()
-        send_mail(
-            subject="Új feliratkozás érkezett",
-            message=f"új feliratkozás érkezett innen: {subsc}",
-            from_email="noreply@sussmann.hu",
-            recipient_list=["notices@sussmann.hu"],
-            fail_silently=False,
-        )
+            Subsc.objects.create(email=subsc)
 
-        messages.success(request, "Nézze az emailjeit!")
+            messages.success(request, 'A feliratkozás megtörtént!')
+
+            html = render_to_string("subsciption_email.html", {
+                "title": "Feliratkozás megerősítve!",
+                "subscriber_email": subsc,
+                "year": datetime.now().year,
+            })
+
+            msg = EmailMultiAlternatives(
+                subject="Köszönjük, hogy feliratkoztál!",
+                body="A leveled HTML-t tartalmaz.",
+                from_email="noreply@sussmann.hu",
+                to=[subsc],
+            )
+            msg.attach_alternative(html, "text/html")
+            msg.send()
+
+            send_mail(
+                subject="Új feliratkozás érkezett",
+                message=f"Új feliratkozás érkezett innen: {subsc}",
+                from_email="noreply@sussmann.hu",
+                recipient_list=["notices@sussmann.hu"],
+                fail_silently=False,
+            )
+
+            messages.success(request, "Nézze az emailjeit!")
+        else:
+            messages.error(request, "Kérjük, igazolja, hogy nem robot.")
+
     return redirect('home')
 
 
