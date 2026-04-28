@@ -3,11 +3,10 @@ load_dotenv()
 
 from pathlib import Path
 import os
-from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-d-f$$@1t$f7ev)$bg=%$=u4&z12q-a4i%ke$=#lb!db#l56yr^'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = False
 
@@ -72,13 +71,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'DemoProject.wsgi.application'
 
 
-
+# 🔹 LOCAL DB (fejlesztéshez)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,38 +106,33 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-
-
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 STATIC_ROOT = 'staticfiles'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-SESSION_COOKIE_AGE = 7 * 24 * 60 * 60  # 7 days
+SESSION_COOKIE_AGE = 7 * 24 * 60 * 60
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51OBNQZHiouEL49qYRe08ptSiRvuQnlq0RMKvffjRJywta2sOmRmADtsfZZTkOf5p1Bji5mo0SfVIn8gW6tegATNQ0069Pm1PCN'
-STRIPE_SECRET_KEY = 'sk_test_51OBNQZHiouEL49qYi7zsDvVqD97vKFUQeih4eTo2DdrgqpGCG6fUc9Pvd5lENCeA5oXs2H49pS5sXCTxoWoAFItg00tJ3PvYQt'
+# 🔐 STRIPE
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
+
+# 📧 EMAIL
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "mail.sussmann.hu"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = "noreply@sussmann.hu"
-EMAIL_HOST_PASSWORD = "NoReply01234"
-DEFAULT_FROM_EMAIL = "noreply@sussmann.hu"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
+
+# ⚡ CACHE
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -145,5 +140,7 @@ CACHES = {
     }
 }
 
-RECAPTCHA_PUBLIC_KEY = "6Lcyjs4sAAAAALOeLsWjJtPZL8BEZQm0bhT9ZBt3"
-RECAPTCHA_PRIVATE_KEY = "6Lcyjs4sAAAAAMh6uSXFIbmPCz-IBH08ZJJw6IZN"
+
+# 🤖 RECAPTCHA
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY")
